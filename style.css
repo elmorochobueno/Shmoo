@@ -1,0 +1,277 @@
+:root {
+    --primary-color: #6F4E37;
+    --secondary-color: #C4A484;
+    --danger-color: #D32F2F;
+    --light-color: #F5F5F5;
+    --dark-color: #333333;
+    --success-color: #388E3C;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Quicksand', sans-serif;
+}
+
+body {
+    background-color: var(--light-color);
+    color: var(--dark-color);
+    line-height: 1.6;
+    padding: 20px;
+}
+
+.container {
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+h1 {
+    color: var(--primary-color);
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.shift-status {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 0.8rem;
+    background-color: var(--danger-color);
+    color: white;
+}
+
+.shift-status.open {
+    background-color: var(--success-color);
+}
+
+.panel {
+    background-color: white;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 15px;
+}
+
+.hidden {
+    display: none;
+}
+
+.btn {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    margin-right: 8px;
+    margin-bottom: 8px;
+    width: 100%;
+}
+
+.btn:hover {
+    opacity: 0.9;
+}
+
+.btn.primary {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.btn.danger {
+    background-color: var(--danger-color);
+    color: white;
+}
+
+.menu {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.menu-item {
+    background-color: var(--light-color);
+    padding: 12px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.menu-item h3 {
+    color: var(--primary-color);
+    margin-bottom: 5px;
+    font-size: 1.1rem;
+}
+
+.quantity-control {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 8px;
+}
+
+.quantity-btn {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    border: 1px solid var(--primary-color);
+    background-color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.quantity {
+    margin: 0 12px;
+    font-size: 1.1rem;
+    min-width: 20px;
+    text-align: center;
+}
+
+.payment-methods {
+    margin-bottom: 15px;
+}
+
+.payment-methods h3 {
+    margin-bottom: 8px;
+    color: var(--primary-color);
+    font-size: 1.1rem;
+}
+
+.payment-methods div {
+    margin-bottom: 5px;
+}
+
+.order-total {
+    text-align: right;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+}
+
+.actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.actions .btn {
+    width: auto;
+    flex: 1;
+}
+
+.notification {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 20px;
+    border-radius: 5px;
+    background-color: var(--success-color);
+    color: white;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    max-width: 90%;
+    text-align: center;
+}
+
+.notification.show {
+    opacity: 1;
+}
+
+.notification.error {
+    background-color: var(--danger-color);
+}
+
+.sales-log-container {
+    margin-top: 20px;
+    background-color: white;
+    border-radius: 10px;
+    padding: 12px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.sales-log-container h2 {
+    color: var(--primary-color);
+    margin-bottom: 10px;
+    font-size: 1.2rem;
+}
+
+.sales-log {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #eee;
+    border-radius: 5px;
+    padding: 10px;
+    background-color: #fafafa;
+}
+
+.sale-entry {
+    padding: 8px 10px;
+    border-bottom: 1px solid #e0e0e0;
+    margin-bottom: 5px;
+    background-color: white;
+    border-radius: 4px;
+}
+
+.sale-entry:first-child {
+    background-color: #e8f5e9;
+    border-left: 3px solid var(--success-color);
+}
+
+.sale-header {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    margin-bottom: 3px;
+}
+
+.sale-details {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: #555;
+}
+
+.sale-items {
+    font-weight: bold;
+    color: var(--primary-color);
+    margin: 3px 0;
+    font-size: 0.9rem;
+}
+
+.empty-log {
+    text-align: center;
+    color: #888;
+    font-style: italic;
+    padding: 20px;
+}
+
+/* Mejoras para móviles */
+@media (max-width: 480px) {
+    body {
+        padding: 10px;
+    }
+    
+    .btn {
+        padding: 12px 10px;
+        font-size: 0.85rem;
+    }
+    
+    .menu-item {
+        padding: 10px;
+    }
+}
