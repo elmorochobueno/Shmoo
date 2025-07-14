@@ -5,18 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shmoo Cafe - Sistema Completo</title>
     
-    <!-- Metadatos PWA -->
-    <link rel="manifest" href="manifest.json">
-    <link rel="icon" type="image/png" href="icon.png">
+    <!-- Configuración PWA -->
+    <base href="./">
     <meta name="theme-color" content="#000000">
+    <link rel="manifest" href="./manifest.json">
     
-    <!-- Fuentes -->
+    <!-- Íconos -->
+    <link rel="icon" href="./icon.png">
+    <link rel="apple-touch-icon" href="./icon.png">
+    
+    <!-- Precarga de recursos -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Fuentes -->
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;700&display=swap" rel="stylesheet">
     
     <!-- Estilos -->
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="./style.css">
+    
+    <!-- Detección de PWA -->
+    <script>
+    if(window.navigator.standalone) {
+        window.location.href = "./";
+    }
+    </script>
 </head>
 <body>
     <div class="container">
@@ -115,7 +128,8 @@
         <div class="notification" id="notification"></div>
     </div>
 
-    <script src="xlsx.full.min.js"></script>
-    <script src="script.js"></script>
+    <!-- Scripts -->
+    <script src="./xlsx.full.min.js"></script>
+    <script src="./script.js"></script>
 </body>
 </html>
