@@ -85,11 +85,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function startNewOrder() {
-        currentOrder = {};
+        currentOrder = {
+            paymentMethod: 'cash' // Valor por defecto
+        };
+        
         shiftData.products.forEach(product => {
             currentOrder[product.name] = 0;
         });
-        currentOrder.paymentMethod = 'cash';
         
         renderOrderQuantities();
         document.getElementById('cash').checked = true;
@@ -106,10 +108,13 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
+        // Obtener método de pago seleccionado
+        const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
+        
         const order = {
             items: { ...currentOrder },
             total,
-            paymentMethod: currentOrder.paymentMethod,
+            paymentMethod, // <-- Esto estaba faltando antes
             timestamp: new Date().toISOString(),
             orderNumber: shiftData.orders.length + 1
         };
@@ -346,26 +351,52 @@ document.addEventListener('DOMContentLoaded', function() {
         // Crear libro de Excel
         const wb = XLSX.utils.book_new();
         
-        // Hoja de resumen
+        // --- Hoja de Resumen ---
         const summaryData = [
-            ['Resumen de Turno'],
+            ['RESUMEN DE VENTAS - SHMOO CAFE'],
             ['Fecha', new Date().toLocaleDateString('es-CL')],
-            ['Hora Inicio', shiftData.currentShiftStart ? new Date(shiftData.currentShiftStart).toLocaleTimeString('es-CL') : 'N/A'],
-            ['Hora Cierre', new Date().toLocaleTimeString('es-CL')],
-            ['Total Pedidos', shiftData.orders.length],
+            ['Turno iniciado', shiftData.currentShiftStart ? new Date(shiftData.currentShiftStart).toLocaleString('es-CL') : 'N/A'],
+            ['Turno cerrado', new Date().toLocaleString('es-CL')],
             [''],
-            ['Método de Pago', 'Total'],
-            ['Efectivo', shiftData.orders.filter(o => o.paymentMethod === 'cash').reduce((sum, o) => sum + o.total, 0)],
-            ['Transferencia', shiftData.orders.filter(o => o.paymentMethod === 'transfer').reduce((sum, o) => sum + o.total, 0)],
-            ['Total General', shiftData.orders.reduce((sum, o) => sum + o.total, 0)]
+            ['TOTALES POR MÉTODO DE PAGO'],
+            ['EFECTIVO', shiftData.orders.filter(o => o.paymentMethod === 'cash').reduce((sum, o) => sum + o.total, 0)],
+            ['TRANSFERENCIA', shiftData.orders.filter(o => o.paymentMethod === 'transfer').reduce((sum, o) => sum + o.total, 0)],
+            ['TOTAL GENERAL', shiftData.orders.reduce((sum, o) => sum + o.total, 0)],
+            [''],
+            ['PRODUCTOS VENDIDOS'],
+            ['Producto', 'Cantidad', 'Total']
         ];
         
-        const wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
-        XLSX.utils.book_append_sheet(wb, wsSummary, "Resumen");
+        // Calcular resumen por producto
+        const productSummary = {};
+        shiftData.products.forEach(product => {
+            productSummary[product.name] = {
+                quantity: 0,
+                total: 0
+            };
+        });
         
-        // Hoja de pedidos detallados
+        shiftData.orders.forEach(order => {
+            for (const [item, quantity] of Object.entries(order.items)) {
+                if (quantity > 0) {
+                    productSummary[item].quantity += quantity;
+                    productSummary[item].total += quantity * shiftData.products.find(p => p.name === item).price;
+                }
+            }
+        });
+        
+        // Agregar productos al resumen
+        Object.entries(productSummary).forEach(([name, data]) => {
+            if (data.quantity > 0) {
+                summaryData.push([name, data.quantity, data.total]);
+            }
+        });
+        
+        const wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
+        
+        // --- Hoja de Pedidos Detallados ---
         const ordersData = [
-            ['N° Pedido', 'Fecha', 'Hora', 'Productos', 'Cantidad', 'Precio Unitario', 'Subtotal', 'Método Pago', 'Total']
+            ['N° Pedido', 'Fecha', 'Hora', 'Producto', 'Cantidad', 'Precio Unitario', 'Subtotal', 'Método Pago', 'Total']
         ];
         
         shiftData.orders.forEach(order => {
@@ -383,21 +414,23 @@ document.addEventListener('DOMContentLoaded', function() {
                             quantity,
                             product.price,
                             quantity * product.price,
-                            firstRow ? (order.paymentMethod === 'cash' ? 'Efectivo' : 'Transferencia') : '',
+                            firstRow ? (order.paymentMethod === 'cash' ? 'EFECTIVO' : 'TRANSFERENCIA') : '',
                             firstRow ? order.total : ''
                         ]);
                         firstRow = false;
                     }
                 }
             }
-            ordersData.push(['']); // Separador
         });
         
         const wsOrders = XLSX.utils.aoa_to_sheet(ordersData);
+        
+        // Agregar hojas al libro
+        XLSX.utils.book_append_sheet(wb, wsSummary, "Resumen");
         XLSX.utils.book_append_sheet(wb, wsOrders, "Pedidos");
         
         // Generar archivo
-        const dateStr = new Date().toISOString().replace(/[:.]/g, '-');
+        const dateStr = new Date().toISOString().split('T')[0];
         XLSX.writeFile(wb, `Reporte_ShmooCafe_${dateStr}.xlsx`);
     }
 
