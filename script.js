@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', function() {
             el.textContent = '0';
         });
         
-        document.getElementById('cash').checked = true;
+        document.querySelector('input[name="payment"][value="cash"]').checked = true;
         updateTotal();
         
         mainPanel.classList.add('hidden');
@@ -192,6 +192,60 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // ======================
+    // FUNCIONES DE PRODUCTOS
+    // ======================
+
+    function loadProducts() {
+        productList.innerHTML = shiftData.products.map((product, index) => `
+            <div class="product-item">
+                <div class="product-info">
+                    <div class="product-name">${product.name}</div>
+                    <div class="product-price">$${product.price.toLocaleString()}</div>
+                </div>
+                <div class="product-actions">
+                    <button class="btn edit-product" data-index="${index}">Editar</button>
+                    <button class="btn danger delete-product" data-index="${index}">Eliminar</button>
+                </div>
+            </div>
+        `).join('');
+
+        document.querySelectorAll('.delete-product').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const index = parseInt(this.getAttribute('data-index'));
+                deleteProduct(index);
+            });
+        });
+
+        document.querySelectorAll('.edit-product').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const index = parseInt(this.getAttribute('data-index'));
+                editProduct(index);
+            });
+        });
+    }
+
+    function deleteProduct(index) {
+        if (confirm(`¿Eliminar "${shiftData.products[index].name}"?`)) {
+            shiftData.products.splice(index, 1);
+            saveData();
+            loadProducts();
+            renderMenuItems();
+            showNotification('Producto eliminado');
+        }
+    }
+
+    function editProduct(index) {
+        const newPrice = prompt(`Editar precio de "${shiftData.products[index].name}"`, shiftData.products[index].price);
+        if (newPrice && !isNaN(newPrice)) {
+            shiftData.products[index].price = parseInt(newPrice);
+            saveData();
+            loadProducts();
+            renderMenuItems();
+            showNotification('Precio actualizado');
+        }
+    }
+
+    // ======================
     // FUNCIONES DE UI
     // ======================
 
@@ -211,7 +265,6 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="product-card" data-id="${product.name}">
                 <div class="product-info">
                     <h3>${product.name}</h3>
-                    ${product.description ? `<p class="product-desc">${product.description}</p>` : ''}
                 </div>
                 <div class="product-price">$${product.price.toLocaleString()}</div>
                 <div class="quantity-selector">
@@ -240,37 +293,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 updateTotal();
             });
         });
-    }
-
-    function loadProducts() {
-        productList.innerHTML = shiftData.products.map((product, index) => `
-            <div class="product-item">
-                <div class="product-info">
-                    <div class="product-name">${product.name}</div>
-                    <div class="product-price">$${product.price.toLocaleString()}</div>
-                </div>
-                <div class="product-actions">
-                    <button class="btn danger delete-product" data-index="${index}">Eliminar</button>
-                </div>
-            </div>
-        `).join('');
-
-        document.querySelectorAll('.delete-product').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const index = parseInt(this.getAttribute('data-index'));
-                deleteProduct(index);
-            });
-        });
-    }
-
-    function deleteProduct(index) {
-        if (confirm(`¿Eliminar "${shiftData.products[index].name}"?`)) {
-            shiftData.products.splice(index, 1);
-            saveData();
-            loadProducts();
-            renderMenuItems();
-            showNotification('Producto eliminado');
-        }
     }
 
     function updateSalesLog() {
