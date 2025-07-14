@@ -158,6 +158,11 @@ h1 {
     color: white;
 }
 
+.edit-product {
+    background-color: var(--secondary-color);
+    color: white;
+}
+
 .highlight-btn {
     background: var(--success-color);
     color: white;
