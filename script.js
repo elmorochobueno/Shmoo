@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', function() {
             { name: 'Capuchino', price: 4500 },
             { name: 'Latte Doble', price: 5000 },
             { name: 'Americano', price: 4400 },
-            { name: 'Dopio', price: 3000 },
+            { name: 'Doppio', price: 3000 },
             { name: 'Leche de almendras', price: 1000 }
         ]
     };
