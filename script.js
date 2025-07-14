@@ -1,5 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Elementos del DOM
+    // ======================
+    // ELEMENTOS DEL DOM
+    // ======================
     const shiftStatus = document.getElementById('shiftStatus');
     const openShiftBtn = document.getElementById('openShiftBtn');
     const closeShiftBtn = document.getElementById('closeShiftBtn');
@@ -23,7 +25,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const tabBtns = document.querySelectorAll('.tab-btn');
     const tabContents = document.querySelectorAll('.tab-content');
 
-    // Variables de estado
+    // ======================
+    // ESTADO INICIAL
+    // ======================
     let currentOrder = {};
     let shiftData = JSON.parse(localStorage.getItem('shmooShift')) || {
         isOpen: false,
@@ -39,12 +43,16 @@ document.addEventListener('DOMContentLoaded', function() {
         ]
     };
 
-    // Inicializar
+    // ======================
+    // INICIALIZACIÓN
+    // ======================
     updateUI();
     loadProducts();
     renderMenuItems();
 
-    // Event listeners
+    // ======================
+    // EVENT LISTENERS
+    // ======================
     openShiftBtn.addEventListener('click', openShift);
     closeShiftBtn.addEventListener('click', closeShift);
     newOrderBtn.addEventListener('click', startNewOrder);
@@ -53,7 +61,6 @@ document.addEventListener('DOMContentLoaded', function() {
     addProductBtn.addEventListener('click', addProduct);
     calculateTotalsBtn.addEventListener('click', calculateCashierTotals);
 
-    // Tabs
     tabBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             const tabId = btn.getAttribute('data-tab');
@@ -61,7 +68,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Funciones principales
+    // ======================
+    // FUNCIONES PRINCIPALES
+    // ======================
+
     function openShift() {
         shiftData = {
             ...shiftData,
@@ -86,14 +96,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function startNewOrder() {
         currentOrder = {
-            paymentMethod: 'cash' // Valor por defecto
+            paymentMethod: 'cash'
         };
         
         shiftData.products.forEach(product => {
             currentOrder[product.name] = 0;
         });
         
-        renderOrderQuantities();
+        document.querySelectorAll('.product-card .quantity').forEach(el => {
+            el.textContent = '0';
+        });
+        
         document.getElementById('cash').checked = true;
         updateTotal();
         
@@ -108,13 +121,12 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        // Obtener método de pago seleccionado
         const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
         
         const order = {
             items: { ...currentOrder },
             total,
-            paymentMethod, // <-- Esto estaba faltando antes
+            paymentMethod,
             timestamp: new Date().toISOString(),
             orderNumber: shiftData.orders.length + 1
         };
@@ -179,7 +191,10 @@ document.addEventListener('DOMContentLoaded', function() {
         showNotification('Arqueo calculado correctamente');
     }
 
-    // Funciones de UI
+    // ======================
+    // FUNCIONES DE UI
+    // ======================
+
     function updateUI() {
         shiftStatus.textContent = shiftData.isOpen ? 'Turno abierto' : 'Turno cerrado';
         shiftStatus.className = shiftData.isOpen ? 'shift-status open' : 'shift-status';
@@ -191,95 +206,45 @@ document.addEventListener('DOMContentLoaded', function() {
         updateSalesLog();
     }
 
-    function updateSalesLog() {
-        if (shiftData.orders.length === 0) {
-            salesLog.innerHTML = '<p class="empty-log">No hay ventas registradas en este turno</p>';
-            return;
-        }
-        
-        salesLog.innerHTML = '';
-        
-        [...shiftData.orders].reverse().forEach(order => {
-            const orderedItems = [];
-            for (const [item, quantity] of Object.entries(order.items)) {
-                if (quantity > 0) {
-                    orderedItems.push(`${item}: ${quantity}`);
-                }
-            }
-            
-            const orderDate = new Date(order.timestamp);
-            const timeString = orderDate.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
-            
-            const paymentMethod = order.paymentMethod === 'cash' ? 'Efectivo' : 'Transferencia';
-            
-            const saleEntry = document.createElement('div');
-            saleEntry.className = 'sale-entry';
-            saleEntry.innerHTML = `
-                <div class="sale-header">
-                    <span>Pedido #${order.orderNumber}</span>
-                    <span>$${order.total.toLocaleString()}</span>
-                </div>
-                <div class="sale-items">${orderedItems.join(' • ')}</div>
-                <div class="sale-details">
-                    <span>${paymentMethod}</span>
-                    <span>${timeString}</span>
-                </div>
-            `;
-            
-            salesLog.appendChild(saleEntry);
-        });
-    }
-
     function renderMenuItems() {
-        menuItems.innerHTML = '';
-        shiftData.products.forEach(product => {
-            const menuItem = document.createElement('div');
-            menuItem.className = 'menu-item';
-            menuItem.innerHTML = `
-                <h3>${product.name}</h3>
-                <p>$${product.price.toLocaleString()}</p>
-                <div class="quantity-control">
-                    <button class="quantity-btn" data-item="${product.name}" data-action="decrease">-</button>
-                    <span class="quantity" data-item="${product.name}">0</span>
-                    <button class="quantity-btn" data-item="${product.name}" data-action="increase">+</button>
+        menuItems.innerHTML = shiftData.products.map(product => `
+            <div class="product-card" data-id="${product.name}">
+                <div class="product-info">
+                    <h3>${product.name}</h3>
+                    ${product.description ? `<p class="product-desc">${product.description}</p>` : ''}
                 </div>
-            `;
-            menuItems.appendChild(menuItem);
-        });
-        
-        // Re-asignar eventos a los botones
-        document.querySelectorAll('.quantity-btn').forEach(btn => {
+                <div class="product-price">$${product.price.toLocaleString()}</div>
+                <div class="quantity-selector">
+                    <button class="qty-btn minus">−</button>
+                    <span class="quantity">0</span>
+                    <button class="qty-btn plus">+</button>
+                </div>
+            </div>
+        `).join('');
+
+        document.querySelectorAll('.qty-btn').forEach(btn => {
             btn.addEventListener('click', function() {
-                const item = this.getAttribute('data-item');
-                const action = this.getAttribute('data-action');
-                
-                if (action === 'increase') {
-                    currentOrder[item]++;
-                } else if (action === 'decrease' && currentOrder[item] > 0) {
-                    currentOrder[item]--;
+                const card = this.closest('.product-card');
+                const productName = card.querySelector('h3').textContent;
+                const quantityEl = card.querySelector('.quantity');
+                let quantity = parseInt(quantityEl.textContent);
+
+                if (this.classList.contains('plus')) {
+                    quantity++;
+                } else if (this.classList.contains('minus') && quantity > 0) {
+                    quantity--;
                 }
-                
-                updateQuantityDisplay(item);
+
+                quantityEl.textContent = quantity;
+                currentOrder[productName] = quantity;
                 updateTotal();
             });
         });
     }
 
-    function renderOrderQuantities() {
-        shiftData.products.forEach(product => {
-            const quantityEl = document.querySelector(`.quantity[data-item="${product.name}"]`);
-            if (quantityEl) {
-                quantityEl.textContent = currentOrder[product.name] || 0;
-            }
-        });
-    }
-
     function loadProducts() {
-        productList.innerHTML = '';
-        shiftData.products.forEach((product, index) => {
-            const productEl = document.createElement('div');
-            productEl.className = 'product-item';
-            productEl.innerHTML = `
+        productList.innerHTML = shiftData.products.map((product, index) => `
+            <div class="product-item">
                 <div class="product-info">
                     <div class="product-name">${product.name}</div>
                     <div class="product-price">$${product.price.toLocaleString()}</div>
@@ -287,11 +252,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="product-actions">
                     <button class="btn danger delete-product" data-index="${index}">Eliminar</button>
                 </div>
-            `;
-            productList.appendChild(productEl);
-        });
-        
-        // Eventos para eliminar productos
+            </div>
+        `).join('');
+
         document.querySelectorAll('.delete-product').forEach(btn => {
             btn.addEventListener('click', function() {
                 const index = parseInt(this.getAttribute('data-index'));
@@ -310,11 +273,38 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    function updateQuantityDisplay(item) {
-        const quantityEl = document.querySelector(`.quantity[data-item="${item}"]`);
-        if (quantityEl) {
-            quantityEl.textContent = currentOrder[item] || 0;
+    function updateSalesLog() {
+        if (shiftData.orders.length === 0) {
+            salesLog.innerHTML = '<p class="empty-log">No hay ventas registradas</p>';
+            return;
         }
+        
+        salesLog.innerHTML = [...shiftData.orders].reverse().map(order => {
+            const orderedItems = [];
+            for (const [item, quantity] of Object.entries(order.items)) {
+                if (quantity > 0) {
+                    orderedItems.push(`${item}: ${quantity}`);
+                }
+            }
+            
+            const orderDate = new Date(order.timestamp);
+            const timeString = orderDate.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
+            const paymentMethod = order.paymentMethod === 'cash' ? 'Efectivo' : 'Transferencia';
+            
+            return `
+                <div class="sale-entry">
+                    <div class="sale-header">
+                        <span>Pedido #${order.orderNumber}</span>
+                        <span>$${order.total.toLocaleString()}</span>
+                    </div>
+                    <div class="sale-items">${orderedItems.join(' • ')}</div>
+                    <div class="sale-details">
+                        <span>${paymentMethod}</span>
+                        <span>${timeString}</span>
+                    </div>
+                </div>
+            `;
+        }).join('');
     }
 
     function updateTotal() {
@@ -322,16 +312,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function calculateTotal() {
-        let total = 0;
-        for (const [item, quantity] of Object.entries(currentOrder)) {
-            if (item !== 'paymentMethod' && quantity > 0) {
-                const product = shiftData.products.find(p => p.name === item);
-                if (product) {
-                    total += quantity * product.price;
-                }
-            }
-        }
-        return total;
+        return shiftData.products.reduce((total, product) => {
+            return total + ((currentOrder[product.name] || 0) * product.price);
+        }, 0);
     }
 
     function switchTab(tabId) {
@@ -342,16 +325,19 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById(`${tabId}-tab`).classList.add('active');
     }
 
+    // ======================
+    // EXPORTACIÓN EXCEL
+    // ======================
+
     function exportToExcel() {
         if (shiftData.orders.length === 0) {
             showNotification('No hay datos para exportar', true);
             return;
         }
         
-        // Crear libro de Excel
         const wb = XLSX.utils.book_new();
         
-        // --- Hoja de Resumen ---
+        // Hoja de Resumen
         const summaryData = [
             ['RESUMEN DE VENTAS - SHMOO CAFE'],
             ['Fecha', new Date().toLocaleDateString('es-CL')],
@@ -367,25 +353,24 @@ document.addEventListener('DOMContentLoaded', function() {
             ['Producto', 'Cantidad', 'Total']
         ];
         
-        // Calcular resumen por producto
+        // Resumen por producto
         const productSummary = {};
         shiftData.products.forEach(product => {
-            productSummary[product.name] = {
-                quantity: 0,
-                total: 0
-            };
+            productSummary[product.name] = { quantity: 0, total: 0 };
         });
         
         shiftData.orders.forEach(order => {
             for (const [item, quantity] of Object.entries(order.items)) {
                 if (quantity > 0) {
-                    productSummary[item].quantity += quantity;
-                    productSummary[item].total += quantity * shiftData.products.find(p => p.name === item).price;
+                    const product = shiftData.products.find(p => p.name === item);
+                    if (product) {
+                        productSummary[item].quantity += quantity;
+                        productSummary[item].total += quantity * product.price;
+                    }
                 }
             }
         });
         
-        // Agregar productos al resumen
         Object.entries(productSummary).forEach(([name, data]) => {
             if (data.quantity > 0) {
                 summaryData.push([name, data.quantity, data.total]);
@@ -394,7 +379,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
         
-        // --- Hoja de Pedidos Detallados ---
+        // Hoja de Pedidos Detallados
         const ordersData = [
             ['N° Pedido', 'Fecha', 'Hora', 'Producto', 'Cantidad', 'Precio Unitario', 'Subtotal', 'Método Pago', 'Total']
         ];
@@ -425,14 +410,16 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const wsOrders = XLSX.utils.aoa_to_sheet(ordersData);
         
-        // Agregar hojas al libro
         XLSX.utils.book_append_sheet(wb, wsSummary, "Resumen");
         XLSX.utils.book_append_sheet(wb, wsOrders, "Pedidos");
         
-        // Generar archivo
         const dateStr = new Date().toISOString().split('T')[0];
         XLSX.writeFile(wb, `Reporte_ShmooCafe_${dateStr}.xlsx`);
     }
+
+    // ======================
+    // FUNCIONES AUXILIARES
+    // ======================
 
     function showNotification(message, isError = false) {
         notification.textContent = message;
