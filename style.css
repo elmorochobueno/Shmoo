@@ -105,8 +105,8 @@ h1 {
     font-size: 0.9rem;
     font-weight: bold;
     transition: all 0.3s ease;
-    margin-right: 8px;
     margin-bottom: 8px;
+    width: 100%;
 }
 
 .btn:hover {
