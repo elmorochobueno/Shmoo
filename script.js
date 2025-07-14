@@ -4,7 +4,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const openShiftBtn = document.getElementById('openShiftBtn');
     const closeShiftBtn = document.getElementById('closeShiftBtn');
     const newOrderBtn = document.getElementById('newOrderBtn');
-    const exportBtn = document.getElementById('exportBtn');
     const mainPanel = document.getElementById('mainPanel');
     const orderPanel = document.getElementById('orderPanel');
     const completeOrderBtn = document.getElementById('completeOrderBtn');
@@ -12,65 +11,60 @@ document.addEventListener('DOMContentLoaded', function() {
     const totalAmount = document.getElementById('totalAmount');
     const notification = document.getElementById('notification');
     const salesLog = document.getElementById('salesLog');
-    
+    const menuItems = document.getElementById('menuItems');
+    const productList = document.getElementById('productList');
+    const productName = document.getElementById('productName');
+    const productPrice = document.getElementById('productPrice');
+    const addProductBtn = document.getElementById('addProductBtn');
+    const calculateTotalsBtn = document.getElementById('calculateTotalsBtn');
+    const cashTotal = document.getElementById('cashTotal');
+    const transferTotal = document.getElementById('transferTotal');
+    const grandTotal = document.getElementById('grandTotal');
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+
     // Variables de estado
-    let currentOrder = {
-        latte: 0,
-        flatWhite: 0,
-        paymentMethod: 'cash'
-    };
-    
-    // Precios
-    const prices = {
-        latte: 4800,
-        flatWhite: 4700
-    };
-    
-    // Cargar datos guardados
+    let currentOrder = {};
     let shiftData = JSON.parse(localStorage.getItem('shmooShift')) || {
         isOpen: false,
         orders: [],
-        currentShiftStart: null
+        products: [
+            { name: 'Latte', price: 4800 },
+            { name: 'Flat White', price: 4700 },
+            { name: 'Capuchino', price: 4500 },
+            { name: 'Latte Doble', price: 5000 },
+            { name: 'Americano', price: 4400 },
+            { name: 'Dopio', price: 3000 },
+            { name: 'Leche de almendras', price: 1000 }
+        ]
     };
-    
-    // Inicializar interfaz
+
+    // Inicializar
     updateUI();
-    
+    loadProducts();
+    renderMenuItems();
+
     // Event listeners
     openShiftBtn.addEventListener('click', openShift);
     closeShiftBtn.addEventListener('click', closeShift);
     newOrderBtn.addEventListener('click', startNewOrder);
     completeOrderBtn.addEventListener('click', completeOrder);
     cancelOrderBtn.addEventListener('click', cancelOrder);
-    exportBtn.addEventListener('click', exportData);
-    
-    // Botones de cantidad
-    document.querySelectorAll('.quantity-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const item = this.getAttribute('data-item');
-            const action = this.getAttribute('data-action');
-            
-            if (action === 'increase') {
-                currentOrder[item]++;
-            } else if (action === 'decrease' && currentOrder[item] > 0) {
-                currentOrder[item]--;
-            }
-            
-            updateQuantityDisplay(item);
-            updateTotal();
+    addProductBtn.addEventListener('click', addProduct);
+    calculateTotalsBtn.addEventListener('click', calculateCashierTotals);
+
+    // Tabs
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const tabId = btn.getAttribute('data-tab');
+            switchTab(tabId);
         });
     });
-    
-    // Métodos de pago
-    document.querySelectorAll('input[name="payment"]').forEach(radio => {
-        radio.addEventListener('change', function() {
-            currentOrder.paymentMethod = this.value;
-        });
-    });
-    
+
     // Funciones principales
     function openShift() {
         shiftData = {
+            ...shiftData,
             isOpen: true,
             orders: [],
             currentShiftStart: new Date().toISOString()
@@ -79,44 +73,43 @@ document.addEventListener('DOMContentLoaded', function() {
         updateUI();
         showNotification('Turno abierto correctamente');
     }
-    
+
     function closeShift() {
-        if (confirm('¿Estás seguro de cerrar el turno? Se borrarán los datos locales.')) {
+        if (confirm('¿Estás seguro de cerrar el turno? Se generará un reporte Excel.')) {
+            exportToExcel();
             shiftData.isOpen = false;
             saveData();
             updateUI();
-            showNotification('Turno cerrado');
+            showNotification('Turno cerrado y reporte generado');
         }
     }
-    
+
     function startNewOrder() {
-        currentOrder = {
-            latte: 0,
-            flatWhite: 0,
-            paymentMethod: 'cash'
-        };
-        
-        document.querySelectorAll('.quantity').forEach(el => {
-            el.textContent = '0';
+        currentOrder = {};
+        shiftData.products.forEach(product => {
+            currentOrder[product.name] = 0;
         });
+        currentOrder.paymentMethod = 'cash';
         
+        renderOrderQuantities();
         document.getElementById('cash').checked = true;
         updateTotal();
         
         mainPanel.classList.add('hidden');
         orderPanel.classList.remove('hidden');
     }
-    
+
     function completeOrder() {
         const total = calculateTotal();
         if (total === 0) {
-            showNotification('Agrega al menos un café al pedido', true);
+            showNotification('Agrega al menos un producto al pedido', true);
             return;
         }
         
         const order = {
-            ...currentOrder,
+            items: { ...currentOrder },
             total,
+            paymentMethod: currentOrder.paymentMethod,
             timestamp: new Date().toISOString(),
             orderNumber: shiftData.orders.length + 1
         };
@@ -130,35 +123,58 @@ document.addEventListener('DOMContentLoaded', function() {
         
         updateSalesLog();
     }
-    
+
     function cancelOrder() {
         if (confirm('¿Cancelar este pedido?')) {
             mainPanel.classList.remove('hidden');
             orderPanel.classList.add('hidden');
         }
     }
-    
-    function exportData() {
-        if (shiftData.orders.length === 0) {
-            showNotification('No hay datos para exportar', true);
+
+    function addProduct() {
+        const name = productName.value.trim();
+        const price = parseInt(productPrice.value);
+        
+        if (!name || isNaN(price)) {
+            showNotification('Ingresa nombre y precio válidos', true);
             return;
         }
         
-        const dataStr = JSON.stringify(shiftData, null, 2);
-        const blob = new Blob([dataStr], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
+        shiftData.products.push({ name, price });
+        saveData();
+        loadProducts();
+        renderMenuItems();
         
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `shmoo_cafe_${new Date().toISOString().split('T')[0]}.json`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        
-        showNotification('Datos exportados correctamente');
+        productName.value = '';
+        productPrice.value = '';
+        showNotification('Producto agregado correctamente');
     }
-    
-    // Funciones auxiliares
+
+    function calculateCashierTotals() {
+        if (shiftData.orders.length === 0) {
+            showNotification('No hay ventas registradas', true);
+            return;
+        }
+        
+        let cash = 0;
+        let transfer = 0;
+        
+        shiftData.orders.forEach(order => {
+            if (order.paymentMethod === 'cash') {
+                cash += order.total;
+            } else {
+                transfer += order.total;
+            }
+        });
+        
+        cashTotal.textContent = `$${cash.toLocaleString()}`;
+        transferTotal.textContent = `$${transfer.toLocaleString()}`;
+        grandTotal.textContent = `$${(cash + transfer).toLocaleString()}`;
+        
+        showNotification('Arqueo calculado correctamente');
+    }
+
+    // Funciones de UI
     function updateUI() {
         shiftStatus.textContent = shiftData.isOpen ? 'Turno abierto' : 'Turno cerrado';
         shiftStatus.className = shiftData.isOpen ? 'shift-status open' : 'shift-status';
@@ -169,7 +185,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         updateSalesLog();
     }
-    
+
     function updateSalesLog() {
         if (shiftData.orders.length === 0) {
             salesLog.innerHTML = '<p class="empty-log">No hay ventas registradas en este turno</p>';
@@ -178,11 +194,13 @@ document.addEventListener('DOMContentLoaded', function() {
         
         salesLog.innerHTML = '';
         
-        // Mostrar órdenes más recientes primero
         [...shiftData.orders].reverse().forEach(order => {
             const orderedItems = [];
-            if (order.latte > 0) orderedItems.push(`Latte: ${order.latte}`);
-            if (order.flatWhite > 0) orderedItems.push(`Flat White: ${order.flatWhite}`);
+            for (const [item, quantity] of Object.entries(order.items)) {
+                if (quantity > 0) {
+                    orderedItems.push(`${item}: ${quantity}`);
+                }
+            }
             
             const orderDate = new Date(order.timestamp);
             const timeString = orderDate.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
@@ -206,19 +224,183 @@ document.addEventListener('DOMContentLoaded', function() {
             salesLog.appendChild(saleEntry);
         });
     }
-    
-    function updateQuantityDisplay(item) {
-        document.querySelector(`.quantity[data-item="${item}"]`).textContent = currentOrder[item];
+
+    function renderMenuItems() {
+        menuItems.innerHTML = '';
+        shiftData.products.forEach(product => {
+            const menuItem = document.createElement('div');
+            menuItem.className = 'menu-item';
+            menuItem.innerHTML = `
+                <h3>${product.name}</h3>
+                <p>$${product.price.toLocaleString()}</p>
+                <div class="quantity-control">
+                    <button class="quantity-btn" data-item="${product.name}" data-action="decrease">-</button>
+                    <span class="quantity" data-item="${product.name}">0</span>
+                    <button class="quantity-btn" data-item="${product.name}" data-action="increase">+</button>
+                </div>
+            `;
+            menuItems.appendChild(menuItem);
+        });
+        
+        // Re-asignar eventos a los botones
+        document.querySelectorAll('.quantity-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const item = this.getAttribute('data-item');
+                const action = this.getAttribute('data-action');
+                
+                if (action === 'increase') {
+                    currentOrder[item]++;
+                } else if (action === 'decrease' && currentOrder[item] > 0) {
+                    currentOrder[item]--;
+                }
+                
+                updateQuantityDisplay(item);
+                updateTotal();
+            });
+        });
     }
-    
+
+    function renderOrderQuantities() {
+        shiftData.products.forEach(product => {
+            const quantityEl = document.querySelector(`.quantity[data-item="${product.name}"]`);
+            if (quantityEl) {
+                quantityEl.textContent = currentOrder[product.name] || 0;
+            }
+        });
+    }
+
+    function loadProducts() {
+        productList.innerHTML = '';
+        shiftData.products.forEach((product, index) => {
+            const productEl = document.createElement('div');
+            productEl.className = 'product-item';
+            productEl.innerHTML = `
+                <div class="product-info">
+                    <div class="product-name">${product.name}</div>
+                    <div class="product-price">$${product.price.toLocaleString()}</div>
+                </div>
+                <div class="product-actions">
+                    <button class="btn danger delete-product" data-index="${index}">Eliminar</button>
+                </div>
+            `;
+            productList.appendChild(productEl);
+        });
+        
+        // Eventos para eliminar productos
+        document.querySelectorAll('.delete-product').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const index = parseInt(this.getAttribute('data-index'));
+                deleteProduct(index);
+            });
+        });
+    }
+
+    function deleteProduct(index) {
+        if (confirm(`¿Eliminar "${shiftData.products[index].name}"?`)) {
+            shiftData.products.splice(index, 1);
+            saveData();
+            loadProducts();
+            renderMenuItems();
+            showNotification('Producto eliminado');
+        }
+    }
+
+    function updateQuantityDisplay(item) {
+        const quantityEl = document.querySelector(`.quantity[data-item="${item}"]`);
+        if (quantityEl) {
+            quantityEl.textContent = currentOrder[item] || 0;
+        }
+    }
+
     function updateTotal() {
         totalAmount.textContent = calculateTotal().toLocaleString();
     }
-    
+
     function calculateTotal() {
-        return (currentOrder.latte * prices.latte) + (currentOrder.flatWhite * prices.flatWhite);
+        let total = 0;
+        for (const [item, quantity] of Object.entries(currentOrder)) {
+            if (item !== 'paymentMethod' && quantity > 0) {
+                const product = shiftData.products.find(p => p.name === item);
+                if (product) {
+                    total += quantity * product.price;
+                }
+            }
+        }
+        return total;
     }
-    
+
+    function switchTab(tabId) {
+        tabBtns.forEach(btn => btn.classList.remove('active'));
+        tabContents.forEach(content => content.classList.remove('active'));
+        
+        document.querySelector(`.tab-btn[data-tab="${tabId}"]`).classList.add('active');
+        document.getElementById(`${tabId}-tab`).classList.add('active');
+    }
+
+    function exportToExcel() {
+        if (shiftData.orders.length === 0) {
+            showNotification('No hay datos para exportar', true);
+            return;
+        }
+        
+        // Crear libro de Excel
+        const wb = XLSX.utils.book_new();
+        
+        // Hoja de resumen
+        const summaryData = [
+            ['Resumen de Turno'],
+            ['Fecha', new Date().toLocaleDateString('es-CL')],
+            ['Hora Inicio', shiftData.currentShiftStart ? new Date(shiftData.currentShiftStart).toLocaleTimeString('es-CL') : 'N/A'],
+            ['Hora Cierre', new Date().toLocaleTimeString('es-CL')],
+            ['Total Pedidos', shiftData.orders.length],
+            [''],
+            ['Método de Pago', 'Total'],
+            ['Efectivo', shiftData.orders.filter(o => o.paymentMethod === 'cash').reduce((sum, o) => sum + o.total, 0)],
+            ['Transferencia', shiftData.orders.filter(o => o.paymentMethod === 'transfer').reduce((sum, o) => sum + o.total, 0)],
+            ['Total General', shiftData.orders.reduce((sum, o) => sum + o.total, 0)]
+        ];
+        
+        const wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
+        XLSX.utils.book_append_sheet(wb, wsSummary, "Resumen");
+        
+        // Hoja de pedidos detallados
+        const ordersData = [
+            ['N° Pedido', 'Fecha', 'Hora', 'Productos', 'Cantidad', 'Precio Unitario', 'Subtotal', 'Método Pago', 'Total']
+        ];
+        
+        shiftData.orders.forEach(order => {
+            let firstRow = true;
+            for (const [item, quantity] of Object.entries(order.items)) {
+                if (quantity > 0) {
+                    const product = shiftData.products.find(p => p.name === item);
+                    if (product) {
+                        const date = new Date(order.timestamp);
+                        ordersData.push([
+                            firstRow ? order.orderNumber : '',
+                            firstRow ? date.toLocaleDateString('es-CL') : '',
+                            firstRow ? date.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' }) : '',
+                            item,
+                            quantity,
+                            product.price,
+                            quantity * product.price,
+                            firstRow ? (order.paymentMethod === 'cash' ? 'Efectivo' : 'Transferencia') : '',
+                            firstRow ? order.total : ''
+                        ]);
+                        firstRow = false;
+                    }
+                }
+            }
+            ordersData.push(['']); // Separador
+        });
+        
+        const wsOrders = XLSX.utils.aoa_to_sheet(ordersData);
+        XLSX.utils.book_append_sheet(wb, wsOrders, "Pedidos");
+        
+        // Generar archivo
+        const dateStr = new Date().toISOString().replace(/[:.]/g, '-');
+        XLSX.writeFile(wb, `Reporte_ShmooCafe_${dateStr}.xlsx`);
+    }
+
     function showNotification(message, isError = false) {
         notification.textContent = message;
         notification.className = 'notification' + (isError ? ' error' : '');
@@ -228,7 +410,7 @@ document.addEventListener('DOMContentLoaded', function() {
             notification.classList.remove('show');
         }, 3000);
     }
-    
+
     function saveData() {
         localStorage.setItem('shmooShift', JSON.stringify(shiftData));
     }
