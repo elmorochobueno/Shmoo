@@ -61,6 +61,28 @@ h1 {
     border-bottom: 1px solid #ddd;
 }
 
+/* Contenedor de botones */
+.button-row {
+    display: flex;
+    margin-bottom: 10px;
+    gap: 10px; /* Espacio entre botones */
+}
+
+/* Botón destacado */
+.highlight-btn {
+    flex: 1; /* Ocupa todo el ancho */
+    padding: 12px;
+    font-size: 1.1em;
+    background-color: #4CAF50; /* Verde */
+    color: white;
+}
+
+/* Ajuste para los botones de turno */
+.button-row .btn:not(.highlight-btn) {
+    flex: 1; /* Ambos iguales */
+    padding: 10px;
+}
+
 .tab-btn {
     flex: 1;
     padding: 10px;
