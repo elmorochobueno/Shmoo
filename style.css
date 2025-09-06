@@ -308,3 +308,151 @@ h1 {
 .last-sale-details {
     font-weight: 600 !important;
 }
+
+/* Estilos para los botones de cantidad */
+.quantity-selector {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+.qty-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid var(--dark-color);
+  background: white;
+  font-size: 1.4rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.qty-btn:hover {
+  background-color: var(--secondary-color);
+  transform: scale(1.1);
+}
+
+.qty-btn:active {
+  transform: scale(0.95);
+}
+
+.quantity {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 0 12px;
+  min-width: 20px;
+  text-align: center;
+}
+
+/* Reorganización de tarjetas de producto */
+.product-card {
+  display: flex;
+  flex-direction: column;
+  height: auto;
+}
+
+.product-info {
+  flex: 1;
+}
+
+.product-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
+
+/* Optimización para landscape */
+@media (orientation: landscape) {
+  .menu-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+  }
+  
+  .product-card {
+    padding: 12px;
+  }
+  
+  .product-info h3 {
+    font-size: 1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .product-price {
+    font-size: 1.1rem;
+    margin: 8px 0;
+  }
+  
+  /* Ajustar paneles para landscape */
+  .panel {
+    padding: 15px;
+  }
+  
+  /* Botones más compactos en landscape */
+  .btn {
+    padding: 10px;
+    font-size: 0.9rem;
+  }
+}
+
+/* Para tablets más grandes en landscape */
+@media (min-width: 768px) and (orientation: landscape) {
+  .menu-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  }
+  
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+}
+
+/* Ajustes específicos para dispositivos móviles en landscape */
+@media (max-height: 500px) and (orientation: landscape) {
+  .container {
+    padding: 5px;
+  }
+  
+  .panel {
+    margin-bottom: 10px;
+    padding: 10px;
+  }
+  
+  .menu-grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 8px;
+    margin-bottom: 15px;
+  }
+  
+  .product-card {
+    padding: 8px;
+  }
+  
+  .product-info h3 {
+    font-size: 0.9rem;
+  }
+  
+  .qty-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 1.2rem;
+  }
+  
+  .quantity {
+    font-size: 1rem;
+    margin: 0 8px;
+  }
+  
+  /* Ajustar altura máxima del contenedor de ventas */
+  .sales-log-container {
+    max-height: 150px;
+    overflow-y: auto;
+  }
+}
