@@ -233,3 +233,78 @@ h1 {
         flex-direction: row;
     }
 }
+
+/* Burbujas de venta */
+.sales-log-container {
+  margin-top: 20px;
+}
+
+.sale-entry {
+  background-color: white;
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: var(--box-shadow);
+  border: 1px solid #e0e0e0;
+  transition: var(--transition);
+}
+
+.sale-entry:last-child {
+  background-color: #f0f7ff;
+  border: 2px solid var(--primary-color);
+}
+
+.sale-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.sale-header:last-child {
+  font-weight: 700;
+  font-size: 1.1em;
+}
+
+.sale-items {
+  color: #555;
+  margin-bottom: 8px;
+  font-size: 0.95em;
+}
+
+.sale-details {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85em;
+  color: #777;
+}
+
+.sale-details:last-child {
+  font-weight: 600;
+}
+
+.empty-log {
+  text-align: center;
+  color: #777;
+  padding: 20px;
+}
+
+/* Estilos específicos para la última venta */
+.last-sale {
+    background-color: #f0f7ff !important;
+    border: 2px solid var(--primary-color) !important;
+}
+
+.last-sale-header {
+    font-weight: 700 !important;
+    font-size: 1.1em !important;
+}
+
+.last-sale-items {
+    font-weight: 600 !important;
+}
+
+.last-sale-details {
+    font-weight: 600 !important;
+}
