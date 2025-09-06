@@ -4,142 +4,323 @@ document.addEventListener('DOMContentLoaded', function() {
     const closeShiftBtn = document.getElementById('closeShiftBtn');
     const newOrderBtn = document.getElementById('newOrderBtn');
     const mainPanel = document.getElementById('mainPanel');
+    const orderPanel = document.getElementById('orderPanel');
     const completeOrderBtn = document.getElementById('completeOrderBtn');
     const cancelOrderBtn = document.getElementById('cancelOrderBtn');
     const totalAmount = document.getElementById('totalAmount');
     const notification = document.getElementById('notification');
     const salesLog = document.getElementById('salesLog');
+    const menuItems = document.getElementById('menuItems');
+    const productList = document.getElementById('productList');
+    const productName = document.getElementById('productName');
+    const productPrice = document.getElementById('productPrice');
+    const addProductBtn = document.getElementById('addProductBtn');
+    const calculateTotalsBtn = document.getElementById('calculateTotalsBtn');
+    const cashTotal = document.getElementById('cashTotal');
+    const qrTotal = document.getElementById('qrTotal');
+    const transferTotal = document.getElementById('transferTotal');
+    const grandTotal = document.getElementById('grandTotal');
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
 
-    const products = [
-        {name: "Latte", price: 4900},
-        {name: "Latte caramelo", price: 5200},
-        {name: "Latte vainilla", price: 5200},
-        {name: "Latte doble", price: 5100},
-        {name: "Flat White", price: 4800},
-        {name: "Capu", price: 4700},
-        {name: "Americano", price: 4500},
-        {name: "Doppio", price: 3000},
-        {name: "Matcha", price: 5300},
-        {name: "Leche de almendras", price: 1000},
-        {name: "Shot extra", price: 800}
-    ];
+    let currentOrder = {};
+    let shiftData = JSON.parse(localStorage.getItem('shmooShift')) || {
+        isOpen: false,
+        orders: [],
+        products: [
+            { name: 'Latte', price: 4900 },
+            { name: 'Latte caramelo', price: 5200 },
+            { name: 'Latte vainilla', price: 5200 },
+            { name: 'Latte doble', price: 5100 },
+            { name: 'Flat White', price: 4800 },
+            { name: 'Capu', price: 4700 },
+            { name: 'Americano', price: 4500 },
+            { name: 'Doppio', price: 3000 },
+            { name: 'Matcha', price: 5300 }
+        ]
+    };
 
-    let shiftData = { orders: [] };
+    updateUI();
+    loadProducts();
+    renderMenuItems();
 
-    function showNotification(message, type="success") {
-        notification.textContent = message;
-        notification.className = `notification show ${type}`;
-        setTimeout(() => notification.className = 'notification', 2500);
+    openShiftBtn.addEventListener('click', openShift);
+    closeShiftBtn.addEventListener('click', closeShift);
+    newOrderBtn.addEventListener('click', startNewOrder);
+    completeOrderBtn.addEventListener('click', completeOrder);
+    cancelOrderBtn.addEventListener('click', cancelOrder);
+    addProductBtn.addEventListener('click', addProduct);
+    calculateTotalsBtn.addEventListener('click', calculateCashierTotals);
+
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const tabId = btn.getAttribute('data-tab');
+            switchTab(tabId);
+        });
+    });
+
+    function openShift() {
+        shiftData = {
+            ...shiftData,
+            isOpen: true,
+            orders: [],
+            currentShiftStart: new Date().toISOString()
+        };
+        saveData();
+        updateUI();
+        showNotification('Turno abierto correctamente');
     }
 
-    function renderMenu() {
-        const menuGrid = document.getElementById('menuGrid');
-        menuGrid.innerHTML = '';
-        products.forEach((product, idx) => {
-            const card = document.createElement('div');
-            card.classList.add('product-card');
-
-            const info = document.createElement('div');
-            info.classList.add('product-info');
-            info.innerHTML = `<h3>${product.name}</h3>`;
-
-            const price = document.createElement('div');
-            price.classList.add('product-price');
-            price.textContent = `$${product.price}`;
-
-            const qtySelector = document.createElement('div');
-            qtySelector.classList.add('quantity-selector');
-            const minusBtn = document.createElement('button');
-            minusBtn.classList.add('qty-btn');
-            minusBtn.textContent = "-";
-            const qty = document.createElement('div');
-            qty.classList.add('quantity');
-            qty.textContent = "0";
-            const plusBtn = document.createElement('button');
-            plusBtn.classList.add('qty-btn');
-            plusBtn.textContent = "+";
-
-            qtySelector.append(minusBtn, qty, plusBtn);
-            card.append(info, price, qtySelector);
-            menuGrid.appendChild(card);
-
-            plusBtn.addEventListener('click', () => {
-                qty.textContent = parseInt(qty.textContent) + 1;
-                updateTotal();
-            });
-            minusBtn.addEventListener('click', () => {
-                if(parseInt(qty.textContent) > 0) {
-                    qty.textContent = parseInt(qty.textContent) - 1;
-                    updateTotal();
-                }
-            });
-        });
+    function closeShift() {
+        if (confirm('¿Estás seguro de cerrar el turno? Se generará un reporte Excel.')) {
+            exportToExcel();
+            shiftData.isOpen = false;
+            saveData();
+            updateUI();
+            showNotification('Turno cerrado y reporte generado');
+        }
     }
 
-    function updateTotal() {
-        const quantities = document.querySelectorAll('.quantity');
-        let total = 0;
-        quantities.forEach((qty, idx) => {
-            total += parseInt(qty.textContent) * products[idx].price;
-        });
-        totalAmount.textContent = `$${total}`;
+    function startNewOrder() {
+        currentOrder = { paymentMethod: 'cash' };
+        shiftData.products.forEach(product => { currentOrder[product.name] = 0; });
+        document.querySelectorAll('.product-card .quantity').forEach(el => { el.textContent = '0'; });
+        document.querySelector('input[name="payment"][value="cash"]').checked = true;
+        updateTotal();
+        mainPanel.classList.add('hidden');
+        orderPanel.classList.remove('hidden');
     }
 
     function completeOrder() {
-        const quantities = document.querySelectorAll('.quantity');
-        let order = { items: [], total: 0 };
-        quantities.forEach((qty, idx) => {
-            const q = parseInt(qty.textContent);
-            if(q > 0) {
-                order.items.push({name: products[idx].name, quantity: q});
-                order.total += q * products[idx].price;
-            }
-        });
-        if(order.items.length === 0) return showNotification("No hay productos seleccionados", "error");
-
+        const total = calculateTotal();
+        if (total === 0) {
+            showNotification('Agrega al menos un producto al pedido', true);
+            return;
+        }
+        const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
+        const order = {
+            items: { ...currentOrder },
+            total,
+            paymentMethod,
+            timestamp: new Date().toISOString(),
+            orderNumber: shiftData.orders.length + 1
+        };
         shiftData.orders.push(order);
-        renderSalesLog();
-        showNotification("Pedido registrado");
-        document.querySelectorAll('.quantity').forEach(q => q.textContent = "0");
-        updateTotal();
+        saveData();
+        showNotification(`Pedido #${order.orderNumber} completado. Total: $${total.toLocaleString()}`);
+        mainPanel.classList.remove('hidden');
+        orderPanel.classList.add('hidden');
+        updateSalesLog();
     }
 
-    function renderSalesLog() {
-        salesLog.innerHTML = '';
-        if(shiftData.orders.length === 0) {
+    function cancelOrder() {
+        if (confirm('¿Cancelar este pedido?')) {
+            mainPanel.classList.remove('hidden');
+            orderPanel.classList.add('hidden');
+        }
+    }
+
+    function addProduct() {
+        const name = productName.value.trim();
+        const price = parseInt(productPrice.value);
+        if (!name || isNaN(price)) {
+            showNotification('Ingresa nombre y precio válidos', true);
+            return;
+        }
+        shiftData.products.push({ name, price });
+        saveData();
+        loadProducts();
+        renderMenuItems();
+        productName.value = '';
+        productPrice.value = '';
+        showNotification('Producto agregado correctamente');
+    }
+
+    function calculateCashierTotals() {
+        if (shiftData.orders.length === 0) {
+            showNotification('No hay ventas registradas', true);
+            return;
+        }
+        let cash = 0, qr = 0, transfer = 0;
+        shiftData.orders.forEach(order => {
+            if (order.paymentMethod === 'cash') cash += order.total;
+            else if (order.paymentMethod === 'qr') qr += order.total;
+            else transfer += order.total;
+        });
+        cashTotal.textContent = `$${cash.toLocaleString()}`;
+        qrTotal.textContent = `$${qr.toLocaleString()}`;
+        transferTotal.textContent = `$${transfer.toLocaleString()}`;
+        grandTotal.textContent = `$${(cash + qr + transfer).toLocaleString()}`;
+        showNotification('Arqueo calculado correctamente');
+    }
+
+    function loadProducts() {
+        productList.innerHTML = shiftData.products.map((product, index) => `
+            <div class="product-item">
+                <div class="product-info">
+                    <div class="product-name">${product.name}</div>
+                    <div class="product-price">$${product.price.toLocaleString()}</div>
+                </div>
+                <div class="product-actions">
+                    <button class="btn edit-product" data-index="${index}">Editar</button>
+                    <button class="btn danger delete-product" data-index="${index}">Eliminar</button>
+                </div>
+            </div>
+        `).join('');
+        document.querySelectorAll('.delete-product').forEach(btn => {
+            btn.addEventListener('click', function() {
+                deleteProduct(parseInt(this.getAttribute('data-index')));
+            });
+        });
+        document.querySelectorAll('.edit-product').forEach(btn => {
+            btn.addEventListener('click', function() {
+                editProduct(parseInt(this.getAttribute('data-index')));
+            });
+        });
+    }
+
+    function deleteProduct(index) {
+        if (confirm(`¿Eliminar "${shiftData.products[index].name}"?`)) {
+            shiftData.products.splice(index, 1);
+            saveData();
+            loadProducts();
+            renderMenuItems();
+            showNotification('Producto eliminado');
+        }
+    }
+
+    function editProduct(index) {
+        const newPrice = prompt(`Editar precio de "${shiftData.products[index].name}"`, shiftData.products[index].price);
+        if (newPrice && !isNaN(newPrice)) {
+            shiftData.products[index].price = parseInt(newPrice);
+            saveData();
+            loadProducts();
+            renderMenuItems();
+            showNotification('Precio actualizado');
+        }
+    }
+
+    function updateUI() {
+        shiftStatus.textContent = shiftData.isOpen ? 'Turno abierto' : 'Turno cerrado';
+        shiftStatus.className = shiftData.isOpen ? 'shift-status open' : 'shift-status';
+        openShiftBtn.disabled = shiftData.isOpen;
+        newOrderBtn.disabled = !shiftData.isOpen;
+        closeShiftBtn.disabled = !shiftData.isOpen;
+        updateSalesLog();
+    }
+
+    function renderMenuItems() {
+        menuItems.innerHTML = shiftData.products.map(product => `
+            <div class="product-card" data-id="${product.name}">
+                <div class="product-info"><h3>${product.name}</h3></div>
+                <div class="product-price">$${product.price.toLocaleString()}</div>
+                <div class="quantity-selector">
+                    <button class="qty-btn minus">−</button>
+                    <span class="quantity">0</span>
+                    <button class="qty-btn plus">+</button>
+                </div>
+            </div>
+        `).join('');
+        document.querySelectorAll('.qty-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const card = this.closest('.product-card');
+                const productName = card.querySelector('h3').textContent;
+                const quantityEl = card.querySelector('.quantity');
+                let quantity = parseInt(quantityEl.textContent);
+                if (this.classList.contains('plus')) quantity++;
+                else if (this.classList.contains('minus') && quantity > 0) quantity--;
+                quantityEl.textContent = quantity;
+                currentOrder[productName] = quantity;
+                updateTotal();
+            });
+        });
+    }
+
+    function updateSalesLog() {
+        if (shiftData.orders.length === 0) {
             salesLog.innerHTML = '<p class="empty-log">No hay ventas registradas</p>';
             return;
         }
-        shiftData.orders.forEach((order, index) => {
-            const saleDiv = document.createElement('div');
-            saleDiv.classList.add('sale-entry');
-
-            if(index === shiftData.orders.length -1){
-                saleDiv.style.transform = 'scale(1.2)';
-                saleDiv.style.boxShadow = '0 6px 16px rgba(0,0,0,0.2)';
+        salesLog.innerHTML = [...shiftData.orders].reverse().map(order => {
+            const orderedItems = [];
+            for (const [item, quantity] of Object.entries(order.items)) {
+                if (quantity > 0) orderedItems.push(`${item}: ${quantity}`);
             }
-
-            const header = document.createElement('div');
-            header.classList.add('sale-header');
-            header.textContent = `Pedido #${index + 1}`;
-
-            const items = document.createElement('div');
-            items.classList.add('sale-items');
-            items.textContent = order.items.map(i => `${i.name} x${i.quantity}`).join(', ');
-
-            const total = document.createElement('div');
-            total.classList.add('sale-details');
-            total.textContent = `$${order.total}`;
-
-            saleDiv.append(header, items, total);
-            salesLog.appendChild(saleDiv);
-        });
+            const orderDate = new Date(order.timestamp);
+            const timeString = orderDate.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
+            let method = 'Transferencia';
+            if (order.paymentMethod === 'cash') method = 'Efectivo';
+            else if (order.paymentMethod === 'qr') method = 'QR';
+            return `
+                <div class="sale-entry">
+                    <div class="sale-header">
+                        <span>Pedido #${order.orderNumber}</span>
+                        <span>$${order.total.toLocaleString()}</span>
+                    </div>
+                    <div class="sale-items">${orderedItems.join(' • ')}</div>
+                    <div class="sale-details">
+                        <span>${method}</span>
+                        <span>${timeString}</span>
+                    </div>
+                </div>
+            `;
+        }).join('');
     }
 
-    renderMenu();
-    completeOrderBtn.addEventListener('click', completeOrder);
-    cancelOrderBtn.addEventListener('click', () => {
-        document.querySelectorAll('.quantity').forEach(q => q.textContent = "0");
-        updateTotal();
-    });
+    function updateTotal() { totalAmount.textContent = calculateTotal().toLocaleString(); }
+    function calculateTotal() {
+        return shiftData.products.reduce((total, product) => {
+            return total + ((currentOrder[product.name] || 0) * product.price);
+        }, 0);
+    }
+
+    function switchTab(tabId) {
+        tabBtns.forEach(btn => btn.classList.remove('active'));
+        tabContents.forEach(content => content.classList.remove('active'));
+        document.querySelector(`.tab-btn[data-tab="${tabId}"]`).classList.add('active');
+        document.getElementById(`${tabId}-tab`).classList.add('active');
+    }
+
+    function exportToExcel() {
+        if (shiftData.orders.length === 0) {
+            showNotification('No hay datos para exportar', true);
+            return;
+        }
+        const wb = XLSX.utils.book_new();
+        const summaryData = [
+            ['RESUMEN DE VENTAS'],
+            ['Fecha', new Date().toLocaleString('es-CL')],
+            [],
+            ['Pedido', 'Productos', 'Método de Pago', 'Total', 'Hora']
+        ];
+        shiftData.orders.forEach(order => {
+            const orderedItems = [];
+            for (const [item, quantity] of Object.entries(order.items)) {
+                if (quantity > 0) orderedItems.push(`${item}: ${quantity}`);
+            }
+            const orderDate = new Date(order.timestamp);
+            const timeString = orderDate.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
+            let method = 'Transferencia';
+            if (order.paymentMethod === 'cash') method = 'Efectivo';
+            else if (order.paymentMethod === 'qr') method = 'QR';
+            summaryData.push([
+                `#${order.orderNumber}`,
+                orderedItems.join(', '),
+                method,
+                `$${order.total.toLocaleString()}`,
+                timeString
+            ]);
+        });
+        const ws = XLSX.utils.aoa_to_sheet(summaryData);
+        XLSX.utils.book_append_sheet(wb, ws, 'Resumen');
+        const fileName = `ShmooCafe_${new Date().toISOString().split('T')[0]}_Turno.xlsx`;
+        XLSX.writeFile(wb, fileName);
+    }
+
+    function saveData() { localStorage.setItem('shmooShift', JSON.stringify(shiftData)); }
+    function showNotification(message, isError = false) {
+        notification.textContent = message;
+        notification.className = 'notification show ' + (isError ? 'error' : 'success');
+        setTimeout(() => { notification.classList.remove('show'); }, 3000);
+    }
 });

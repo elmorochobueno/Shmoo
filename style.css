@@ -1,9 +1,9 @@
 :root {
-    --primary-color: #2e68b0;
-    --secondary-color: #1e1e1c;
+    --primary-color: #2e68b0;   /* principal */
+    --secondary-color: #fdc905; /* fondo destacado */
     --danger-color: #D32F2F;
-    --light-color: #fdc905;
-    --dark-color: #1e1e1c;
+    --light-color: #fdc905;     /* fondo */
+    --dark-color: #1e1e1c;      /* contornos */
     --success-color: #388E3C;
     --border-radius: 12px;
     --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
@@ -62,6 +62,38 @@ h1 {
     background-color: var(--success-color);
 }
 
+/* TABS */
+.tabs {
+    display: flex;
+    margin-bottom: 15px;
+    border-bottom: 1px solid var(--dark-color);
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--dark-color);
+    border-bottom: 3px solid transparent;
+    transition: var(--transition);
+}
+
+.tab-btn.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
 /* PANEL BASE */
 .panel {
     background-color: white;
@@ -70,9 +102,26 @@ h1 {
     box-shadow: var(--box-shadow);
     margin-bottom: 20px;
     transition: var(--transition);
+    border: 1px solid var(--dark-color);
 }
 
-/* BOTONES */
+.hidden {
+    display: none;
+}
+
+/* BOTONES PRINCIPALES */
+.shift-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.shift-top-row {
+    display: flex;
+    gap: 12px;
+}
+
 .btn {
     padding: 12px;
     border: none;
@@ -86,6 +135,20 @@ h1 {
     gap: 8px;
 }
 
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+.shift-top-row .btn {
+    flex: 1;
+    font-size: 0.95rem;
+}
+
 .primary {
     background-color: var(--primary-color);
     color: white;
@@ -94,6 +157,11 @@ h1 {
 .danger {
     background-color: var(--danger-color);
     color: white;
+}
+
+.edit-product {
+    background-color: var(--secondary-color);
+    color: var(--dark-color);
 }
 
 .highlight-btn {
@@ -105,7 +173,12 @@ h1 {
     letter-spacing: 0.5px;
 }
 
-/* PRODUCTOS */
+.highlight-btn:disabled {
+    background: #a5d6a7;
+    cursor: not-allowed;
+}
+
+/* PRODUCTOS EN MENÚ */
 .menu-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -114,176 +187,49 @@ h1 {
 }
 
 .product-card {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    background: white;
     border-radius: var(--border-radius);
     padding: 16px;
     box-shadow: var(--box-shadow);
-    border: 1px solid rgba(0,0,0,0.05);
-    background-color: white;
+    transition: var(--transition);
+    border: 2px solid var(--dark-color);
 }
 
-.product-info {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    flex: 1;
+.product-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
 }
 
 .product-info h3 {
     color: var(--primary-color);
+    margin-bottom: 6px;
+    font-size: 1.1rem;
     font-weight: 600;
+}
+
+.product-desc {
+    color: #666;
+    font-size: 0.85rem;
+    margin-bottom: 12px;
+    line-height: 1.4;
 }
 
 .product-price {
-    color: var(--dark-color);
-    font-weight: 600;
-    text-align: center;
-}
-
-.quantity-selector {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.qty-btn {
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    border: none;
-    background: var(--primary-color);
-    color: white;
-    font-size: 1.4rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: var(--transition);
-}
-
-.quantity {
-    min-width: 32px;
-    text-align: center;
+    font-weight: 700;
+    color: var(--success-color);
     font-size: 1.2rem;
+    margin: 10px 0;
 }
 
-/* PAGO */
-.payment-options {
-    display: flex;
-    gap: 32px;
-    margin: 16px 0;
-}
-
-/* ACCIONES */
-.order-actions {
-    display: flex;
-    gap: 20px;
-    justify-content: space-between;
-}
-
-.success-btn {
-    background: var(--success-color);
-    color: white;
-    flex: 1;
-    font-weight: 600;
-}
-
-.cancel-btn {
-    background: #f5f5f5;
-    color: #666;
-    flex: 1;
-    border: 1px solid #ddd;
-}
-
-/* BURBUJAS DE PEDIDOS */
-.sales-log {
-    display: flex;
-    flex-wrap: wrap;
-    max-height: 400px;
-    overflow-y: auto;
-    padding: 10px;
-}
-
-.sale-entry {
-    display: inline-flex;
-    flex-direction: column;
-    padding: 14px 18px;
-    margin: 6px;
-    border-radius: 20px;
-    background-color: #ffffff;
-    border: 1px solid #ddd;
-    min-width: 120px;
-    text-align: center;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.sale-entry:last-child {
-    transform: scale(1.2);
-    box-shadow: 0 6px 16px rgba(0,0,0,0.2);
-}
-
-/* RESPONSIVE */
-@media (max-width: 768px) {
-    .menu-grid { grid-template-columns: 1fr; }
-    .payment-options { flex-direction: column; gap: 10px; }
-    .order-actions { flex-direction: column; }
-}
-/* ======================
-   OPTIMIZACIÓN TABLET LANDSCAPE
-   ====================== */
-@media (min-width: 769px) and (max-width: 1200px) and (orientation: landscape) {
-    /* Grilla de productos más columnas */
+/* Landscape Tablets */
+@media (orientation: landscape) and (max-width: 1024px) {
     .menu-grid {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 20px;
+        grid-template-columns: 1fr 1fr 1fr;
     }
-
-    /* Burbuja de ventas alineadas en fila */
-    .sales-log {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 16px;
-        max-height: none;
-    }
-
-    .sale-entry {
-        flex: 1 1 calc(33% - 16px);
-        margin-bottom: 0;
-    }
-
-    /* Último pedido más grande */
-    .sales-log .sale-entry:first-child {
-        flex: 2 1 calc(66% - 16px);
-    }
-
-    /* Botones Confirmar y Cancelar uno al lado del otro, más separados */
-    .order-actions {
-        justify-content: space-between;
+    .shift-controls {
         flex-direction: row;
-        gap: 24px;
     }
-
-    .success-btn, .cancel-btn {
-        width: 48%;
-    }
-
-    /* Métodos de pago más espaciados horizontalmente */
-    .payment-options {
-        justify-content: space-around;
-        flex-wrap: wrap;
-    }
-
-    /* Botones + y - más grandes y a la derecha */
-    .quantity-selector {
-        flex-direction: row-reverse;
-        gap: 12px;
-    }
-
-    .qty-btn {
-        width: 40px;
-        height: 40px;
-        font-size: 1.4rem;
+    .order-actions {
+        flex-direction: row;
     }
 }
