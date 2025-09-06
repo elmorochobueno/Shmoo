@@ -37,8 +37,8 @@ document.addEventListener('DOMContentLoaded', function() {
             { name: 'Americano', price: 4500 },
             { name: 'Doppio', price: 3000 },
             { name: 'Matcha', price: 5300 },
-            { name: 'Leche de almendras', price: 3000 },
-            { name: 'Extra shot', price: 3000 }
+            { name: 'Leche de almendras', price: 1000 },
+            { name: 'Extra shot', price: 800 },
         ]
     };
 
@@ -212,47 +212,47 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function renderMenuItems() {
-    menuItems.innerHTML = shiftData.products.map(product => `
-        <div class="product-card" data-id="${product.name}">
-            <div class="product-info">
-                <h3>${product.name}</h3>
-                <div class="product-price">$${product.price.toLocaleString()}</div>
-            </div>
-            <div class="product-card-footer">
-                <div class="quantity-selector">
-                    <button class="qty-btn minus">−</button>
-                    <span class="quantity">0</span>
-                    <button class="qty-btn plus">+</button>
+        menuItems.innerHTML = shiftData.products.map(product => `
+            <div class="product-card" data-id="${product.name}">
+                <div class="product-info">
+                    <h3>${product.name}</h3>
+                    <div class="product-price">$${product.price.toLocaleString()}</div>
+                </div>
+                <div class="product-card-footer">
+                    <div class="quantity-selector">
+                        <button class="qty-btn minus">−</button>
+                        <span class="quantity">0</span>
+                        <button class="qty-btn plus">+</button>
+                    </div>
                 </div>
             </div>
-        </div>
-    `).join('');
-    
-    document.querySelectorAll('.qty-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const card = this.closest('.product-card');
-            const productName = card.querySelector('h3').textContent;
-            const quantityEl = card.querySelector('.quantity');
-            let quantity = parseInt(quantityEl.textContent);
-            
-            if (this.classList.contains('plus')) quantity++;
-            else if (this.classList.contains('minus') && quantity > 0) quantity--;
-            
-            quantityEl.textContent = quantity;
-            currentOrder[productName] = quantity;
-            updateTotal();
-            
-            // Efecto visual al cambiar cantidad
-            if (quantity > 0) {
-                quantityEl.style.fontWeight = 'bold';
-                quantityEl.style.color = var(--primary-color);
-            } else {
-                quantityEl.style.fontWeight = 'normal';
-                quantityEl.style.color = 'inherit';
-            }
+        `).join('');
+        
+        document.querySelectorAll('.qty-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const card = this.closest('.product-card');
+                const productName = card.querySelector('h3').textContent;
+                const quantityEl = card.querySelector('.quantity');
+                let quantity = parseInt(quantityEl.textContent);
+                
+                if (this.classList.contains('plus')) quantity++;
+                else if (this.classList.contains('minus') && quantity > 0) quantity--;
+                
+                quantityEl.textContent = quantity;
+                currentOrder[productName] = quantity;
+                updateTotal();
+                
+                // Efecto visual al cambiar cantidad
+                if (quantity > 0) {
+                    quantityEl.style.fontWeight = 'bold';
+                    quantityEl.style.color = '#2e68b0';
+                } else {
+                    quantityEl.style.fontWeight = 'normal';
+                    quantityEl.style.color = 'inherit';
+                }
+            });
         });
-    });
-}
+    }
 
     function updateSalesLog() {
         if (shiftData.orders.length === 0) {
@@ -346,4 +346,4 @@ document.addEventListener('DOMContentLoaded', function() {
         notification.className = 'notification show ' + (isError ? 'error' : 'success');
         setTimeout(() => { notification.classList.remove('show'); }, 3000);
     }
-});
+});w
