@@ -210,7 +210,7 @@ h1 {
 }
 
 .product-price {
-    margin-left: 50px;
+    margin-left: 6px;
     color: var(--dark-color); /* Precios en negro */
 }
 
