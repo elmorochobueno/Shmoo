@@ -36,7 +36,9 @@ document.addEventListener('DOMContentLoaded', function() {
             { name: 'Capu', price: 4700 },
             { name: 'Americano', price: 4500 },
             { name: 'Doppio', price: 3000 },
-            { name: 'Matcha', price: 5300 }
+            { name: 'Matcha', price: 5300 },
+            { name: 'Leche de almendras', price: 1000 },
+            { name: 'Shot extra', price: 800 }
         ]
     };
 
