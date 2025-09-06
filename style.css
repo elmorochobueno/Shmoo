@@ -216,7 +216,7 @@ h1 {
 
 .product-price {
     font-weight: 700;
-    color: var(--success-color);
+    color: var(--dark-color);
     font-size: 1.2rem;
     margin: 10px 0;
 }
