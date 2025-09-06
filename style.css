@@ -62,38 +62,6 @@ h1 {
     background-color: var(--success-color);
 }
 
-/* TABS */
-.tabs {
-    display: flex;
-    margin-bottom: 15px;
-    border-bottom: 1px solid #ddd;
-}
-
-.tab-btn {
-    flex: 1;
-    padding: 12px;
-    border: none;
-    background: none;
-    cursor: pointer;
-    font-weight: 600;
-    color: var(--dark-color);
-    border-bottom: 3px solid transparent;
-    transition: var(--transition);
-}
-
-.tab-btn.active {
-    color: var(--primary-color);
-    border-bottom-color: var(--primary-color);
-}
-
-.tab-content {
-    display: none;
-}
-
-.tab-content.active {
-    display: block;
-}
-
 /* PANEL BASE */
 .panel {
     background-color: white;
@@ -104,23 +72,7 @@ h1 {
     transition: var(--transition);
 }
 
-.hidden {
-    display: none;
-}
-
-/* BOTONES PRINCIPALES */
-.shift-controls {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    margin-bottom: 25px;
-}
-
-.shift-top-row {
-    display: flex;
-    gap: 12px;
-}
-
+/* BOTONES */
 .btn {
     padding: 12px;
     border: none;
@@ -134,20 +86,6 @@ h1 {
     gap: 8px;
 }
 
-.btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
-.btn:active {
-    transform: translateY(0);
-}
-
-.shift-top-row .btn {
-    flex: 1;
-    font-size: 0.95rem;
-}
-
 .primary {
     background-color: var(--primary-color);
     color: white;
@@ -155,11 +93,6 @@ h1 {
 
 .danger {
     background-color: var(--danger-color);
-    color: white;
-}
-
-.edit-product {
-    background-color: var(--secondary-color);
     color: white;
 }
 
@@ -172,12 +105,7 @@ h1 {
     letter-spacing: 0.5px;
 }
 
-.highlight-btn:disabled {
-    background: #a5d6a7;
-    cursor: not-allowed;
-}
-
-/* PRODUCTOS EN MENÚ */
+/* PRODUCTOS */
 .menu-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -205,14 +133,12 @@ h1 {
 
 .product-info h3 {
     color: var(--primary-color);
-    margin-bottom: 4px;
-    font-size: 1.1rem;
     font-weight: 600;
 }
 
 .product-price {
-    font-weight: 600;
     color: var(--dark-color);
+    font-weight: 600;
     text-align: center;
 }
 
@@ -237,85 +163,20 @@ h1 {
     transition: var(--transition);
 }
 
-.qty-btn:hover {
-    background: #235192;
-    transform: scale(1.1);
-}
-
-.qty-btn:active {
-    transform: scale(0.95);
-}
-
 .quantity {
     min-width: 32px;
     text-align: center;
     font-size: 1.2rem;
 }
 
-/* PAGO Y TOTALES */
-.payment-methods {
-    margin: 20px 0;
-}
-
-.payment-methods h3 {
-    margin-bottom: 12px;
-    color: var(--primary-color);
-    font-size: 1.1rem;
-}
-
+/* PAGO */
 .payment-options {
     display: flex;
     gap: 32px;
     margin: 16px 0;
 }
 
-.payment-option {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-    font-size: 0.95rem;
-}
-
-.custom-radio {
-    width: 18px;
-    height: 18px;
-    border: 2px solid var(--primary-color);
-    border-radius: 50%;
-    display: inline-block;
-    position: relative;
-    transition: var(--transition);
-}
-
-input[type="radio"] {
-    display: none;
-}
-
-input[type="radio"]:checked + .custom-radio {
-    border-color: var(--success-color);
-}
-
-input[type="radio"]:checked + .custom-radio::after {
-    content: "";
-    width: 10px;
-    height: 10px;
-    background: var(--success-color);
-    border-radius: 50%;
-    position: absolute;
-    top: 2px;
-    left: 2px;
-}
-
-.order-summary {
-    background: #f8f8f8;
-    padding: 18px;
-    border-radius: var(--border-radius);
-    margin: 25px 0;
-    text-align: right;
-    font-size: 1.2rem;
-    font-weight: 600;
-}
-
+/* ACCIONES */
 .order-actions {
     display: flex;
     gap: 20px;
@@ -336,21 +197,7 @@ input[type="radio"]:checked + .custom-radio::after {
     border: 1px solid #ddd;
 }
 
-/* ICONOS */
-.icon-add::before {
-    content: "+";
-    font-weight: bold;
-}
-
-.icon-check::before {
-    content: "✓";
-}
-
-.icon-close::before {
-    content: "✕";
-}
-
-/* REGISTRO DE VENTAS EN BURBUJAS */
+/* BURBUJAS DE PEDIDOS */
 .sales-log {
     display: flex;
     flex-wrap: wrap;
@@ -377,34 +224,9 @@ input[type="radio"]:checked + .custom-radio::after {
     box-shadow: 0 6px 16px rgba(0,0,0,0.2);
 }
 
-.sale-header, .sale-items {
-    margin-bottom: 6px;
-}
-
 /* RESPONSIVE */
 @media (max-width: 768px) {
-    .menu-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .product-form {
-        grid-template-columns: 1fr;
-    }
-    
-    .shift-top-row {
-        flex-direction: column;
-    }
-    
-    .payment-options {
-        flex-direction: column;
-        gap: 10px;
-    }
-    
-    .order-actions {
-        flex-direction: column;
-    }
-    
-    .success-btn, .cancel-btn {
-        width: 100%;
-    }
+    .menu-grid { grid-template-columns: 1fr; }
+    .payment-options { flex-direction: column; gap: 10px; }
+    .order-actions { flex-direction: column; }
 }
