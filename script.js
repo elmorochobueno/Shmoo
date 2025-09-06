@@ -243,7 +243,8 @@ document.addEventListener('DOMContentLoaded', function() {
             salesLog.innerHTML = '<p class="empty-log">No hay ventas registradas</p>';
             return;
         }
-        salesLog.innerHTML = [...shiftData.orders].reverse().map(order => {
+        
+        salesLog.innerHTML = [...shiftData.orders].reverse().map((order, index) => {
             const orderedItems = [];
             for (const [item, quantity] of Object.entries(order.items)) {
                 if (quantity > 0) orderedItems.push(`${item}: ${quantity}`);
@@ -253,14 +254,18 @@ document.addEventListener('DOMContentLoaded', function() {
             let method = 'Transferencia';
             if (order.paymentMethod === 'cash') method = 'Efectivo';
             else if (order.paymentMethod === 'qr') method = 'QR';
+            
+            // Determinar si es la última venta (primera en la lista invertida)
+            const isLastSale = index === 0;
+            
             return `
-                <div class="sale-entry">
-                    <div class="sale-header">
+                <div class="sale-entry ${isLastSale ? 'last-sale' : ''}">
+                    <div class="sale-header ${isLastSale ? 'last-sale-header' : ''}">
                         <span>Pedido #${order.orderNumber}</span>
                         <span>$${order.total.toLocaleString()}</span>
                     </div>
-                    <div class="sale-items">${orderedItems.join(' • ')}</div>
-                    <div class="sale-details">
+                    <div class="sale-items ${isLastSale ? 'last-sale-items' : ''}">${orderedItems.join(' • ')}</div>
+                    <div class="sale-details ${isLastSale ? 'last-sale-details' : ''}">
                         <span>${method}</span>
                         <span>${timeString}</span>
                     </div>
