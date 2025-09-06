@@ -193,11 +193,18 @@ h1 {
     box-shadow: var(--box-shadow);
     transition: var(--transition);
     border: 2px solid var(--dark-color);
+    display: flex;
+    flex-direction: column;
+    height: auto;
 }
 
 .product-card:hover {
     transform: translateY(-3px);
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+.product-info {
+    flex: 1;
 }
 
 .product-info h3 {
@@ -216,97 +223,9 @@ h1 {
 
 .product-price {
     font-weight: 700;
-    color: var(--dark-color);
+    color: var(--success-color);
     font-size: 1.2rem;
     margin: 10px 0;
-}
-
-/* Landscape Tablets */
-@media (orientation: landscape) and (max-width: 1024px) {
-    .menu-grid {
-        grid-template-columns: 1fr 1fr 1fr;
-    }
-    .shift-controls {
-        flex-direction: row;
-    }
-    .order-actions {
-        flex-direction: row;
-    }
-}
-
-/* Burbujas de venta */
-.sales-log-container {
-  margin-top: 20px;
-}
-
-.sale-entry {
-  background-color: white;
-  border-radius: 16px;
-  padding: 16px;
-  margin-bottom: 12px;
-  box-shadow: var(--box-shadow);
-  border: 1px solid #e0e0e0;
-  transition: var(--transition);
-}
-
-.sale-entry:last-child {
-  background-color: #f0f7ff;
-  border: 2px solid var(--primary-color);
-}
-
-.sale-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-  font-weight: 600;
-}
-
-.sale-header:last-child {
-  font-weight: 700;
-  font-size: 1.1em;
-}
-
-.sale-items {
-  color: #555;
-  margin-bottom: 8px;
-  font-size: 0.95em;
-}
-
-.sale-details {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.85em;
-  color: #777;
-}
-
-.sale-details:last-child {
-  font-weight: 600;
-}
-
-.empty-log {
-  text-align: center;
-  color: #777;
-  padding: 20px;
-}
-
-/* Estilos específicos para la última venta */
-.last-sale {
-    background-color: #f0f7ff !important;
-    border: 2px solid var(--primary-color) !important;
-}
-
-.last-sale-header {
-    font-weight: 700 !important;
-    font-size: 1.1em !important;
-}
-
-.last-sale-items {
-    font-weight: 600 !important;
-}
-
-.last-sale-details {
-    font-weight: 600 !important;
 }
 
 /* Estilos para los botones de cantidad */
@@ -349,112 +268,11 @@ h1 {
   text-align: center;
 }
 
-/* Reorganización de tarjetas de producto */
-.product-card {
-  display: flex;
-  flex-direction: column;
-  height: auto;
-}
-
-.product-info {
-  flex: 1;
-}
-
 .product-card-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-top: 10px;
-}
-
-/* Optimización para landscape */
-@media (orientation: landscape) {
-  .menu-grid {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 12px;
-  }
-  
-  .product-card {
-    padding: 12px;
-  }
-  
-  .product-info h3 {
-    font-size: 1rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  
-  .product-price {
-    font-size: 1.1rem;
-    margin: 8px 0;
-  }
-  
-  /* Ajustar paneles para landscape */
-  .panel {
-    padding: 15px;
-  }
-  
-  /* Botones más compactos en landscape */
-  .btn {
-    padding: 10px;
-    font-size: 0.9rem;
-  }
-}
-
-/* Para tablets más grandes en landscape */
-@media (min-width: 768px) and (orientation: landscape) {
-  .menu-grid {
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  }
-  
-  .container {
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-}
-
-/* Ajustes específicos para dispositivos móviles en landscape */
-@media (max-height: 500px) and (orientation: landscape) {
-  .container {
-    padding: 5px;
-  }
-  
-  .panel {
-    margin-bottom: 10px;
-    padding: 10px;
-  }
-  
-  .menu-grid {
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 8px;
-    margin-bottom: 15px;
-  }
-  
-  .product-card {
-    padding: 8px;
-  }
-  
-  .product-info h3 {
-    font-size: 0.9rem;
-  }
-  
-  .qty-btn {
-    width: 32px;
-    height: 32px;
-    font-size: 1.2rem;
-  }
-  
-  .quantity {
-    font-size: 1rem;
-    margin: 0 8px;
-  }
-  
-  /* Ajustar altura máxima del contenedor de ventas */
-  .sales-log-container {
-    max-height: 150px;
-    overflow-y: auto;
-  }
 }
 
 /* Métodos de pago más espaciados */
@@ -550,8 +368,119 @@ h1 {
   border-radius: 50%;
 }
 
-/* Ajustes para landscape */
+.payment-text {
+  font-weight: 500;
+}
+
+/* Burbujas de venta */
+.sales-log-container {
+  margin-top: 20px;
+}
+
+.sale-entry {
+  background-color: white;
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: var(--box-shadow);
+  border: 1px solid #e0e0e0;
+  transition: var(--transition);
+}
+
+.sale-entry:last-child {
+  background-color: #f0f7ff;
+  border: 2px solid var(--primary-color);
+}
+
+.sale-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.sale-header:last-child {
+  font-weight: 700;
+  font-size: 1.1em;
+}
+
+.sale-items {
+  color: #555;
+  margin-bottom: 8px;
+  font-size: 0.95em;
+}
+
+.sale-details {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85em;
+  color: #777;
+}
+
+.sale-details:last-child {
+  font-weight: 600;
+}
+
+.empty-log {
+  text-align: center;
+  color: #777;
+  padding: 20px;
+}
+
+/* Estilos específicos para la última venta */
+.last-sale {
+    background-color: #f0f7ff !important;
+    border: 2px solid var(--primary-color) !important;
+}
+
+.last-sale-header {
+    font-weight: 700 !important;
+    font-size: 1.1em !important;
+}
+
+.last-sale-items {
+    font-weight: 600 !important;
+}
+
+.last-sale-details {
+    font-weight: 600 !important;
+}
+
+/* Optimización para landscape */
 @media (orientation: landscape) {
+  .menu-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+  }
+  
+  .product-card {
+    padding: 12px;
+  }
+  
+  .product-info h3 {
+    font-size: 1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .product-price {
+    font-size: 1.1rem;
+    margin: 8px 0;
+  }
+  
+  /* Ajustar paneles para landscape */
+  .panel {
+    padding: 15px;
+  }
+  
+  /* Botones más compactos en landscape */
+  .btn {
+    padding: 10px;
+    font-size: 0.9rem;
+  }
+  
   .payment-options {
     flex-direction: row;
     justify-content: space-between;
@@ -572,4 +501,72 @@ h1 {
   .order-actions {
     gap: 15px;
   }
+}
+
+/* Para tablets más grandes en landscape */
+@media (min-width: 768px) and (orientation: landscape) {
+  .menu-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  }
+  
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+}
+
+/* Ajustes específicos para dispositivos móviles en landscape */
+@media (max-height: 500px) and (orientation: landscape) {
+  .container {
+    padding: 5px;
+  }
+  
+  .panel {
+    margin-bottom: 10px;
+    padding: 10px;
+  }
+  
+  .menu-grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 8px;
+    margin-bottom: 15px;
+  }
+  
+  .product-card {
+    padding: 8px;
+  }
+  
+  .product-info h3 {
+    font-size: 0.9rem;
+  }
+  
+  .qty-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 1.2rem;
+  }
+  
+  .quantity {
+    font-size: 1rem;
+    margin: 0 8px;
+  }
+  
+  /* Ajustar altura máxima del contenedor de ventas */
+  .sales-log-container {
+    max-height: 150px;
+    overflow-y: auto;
+  }
+}
+
+/* Landscape Tablets */
+@media (orientation: landscape) and (max-width: 1024px) {
+    .menu-grid {
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+    .shift-controls {
+        flex-direction: row;
+    }
+    .order-actions {
+        flex-direction: row;
+    }
 }
