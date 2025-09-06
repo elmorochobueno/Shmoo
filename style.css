@@ -456,3 +456,120 @@ h1 {
     overflow-y: auto;
   }
 }
+
+/* Métodos de pago más espaciados */
+.payment-options {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 20px 0;
+}
+
+.payment-option {
+  display: flex;
+  align-items: center;
+  padding: 14px 16px;
+  border: 2px solid #e0e0e0;
+  border-radius: var(--border-radius);
+  transition: var(--transition);
+  cursor: pointer;
+}
+
+.payment-option:hover {
+  border-color: var(--primary-color);
+  background-color: #f8f9fa;
+}
+
+.payment-option input[type="radio"] {
+  margin-right: 12px;
+  transform: scale(1.2);
+}
+
+/* Botones de acción uno al lado del otro */
+.order-actions {
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+  margin-top: 25px;
+}
+
+.order-actions .btn {
+  flex: 1;
+  padding: 16px;
+  font-size: 1.1rem;
+}
+
+/* Estilos específicos para botones de confirmar y cancelar */
+.success-btn {
+  background-color: var(--success-color);
+  color: white;
+}
+
+.cancel-btn {
+  background-color: #9e9e9e;
+  color: white;
+}
+
+.success-btn:hover {
+  background-color: #2e7d32;
+}
+
+.cancel-btn:hover {
+  background-color: #757575;
+}
+
+/* Radio buttons personalizados */
+.payment-option input[type="radio"] {
+  display: none;
+}
+
+.custom-radio {
+  width: 22px;
+  height: 22px;
+  border: 2px solid #757575;
+  border-radius: 50%;
+  margin-right: 12px;
+  position: relative;
+  display: inline-block;
+  transition: var(--transition);
+}
+
+.payment-option input[type="radio"]:checked + .custom-radio {
+  border-color: var(--primary-color);
+  background-color: var(--primary-color);
+}
+
+.payment-option input[type="radio"]:checked + .custom-radio::after {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 10px;
+  height: 10px;
+  background-color: white;
+  border-radius: 50%;
+}
+
+/* Ajustes para landscape */
+@media (orientation: landscape) {
+  .payment-options {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  
+  .payment-option {
+    flex: 1;
+    flex-direction: column;
+    text-align: center;
+    padding: 12px;
+  }
+  
+  .payment-option input[type="radio"] {
+    margin-right: 0;
+    margin-bottom: 8px;
+  }
+  
+  .order-actions {
+    gap: 15px;
+  }
+}
