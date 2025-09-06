@@ -3,139 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shmoo Cafe</title>
+    <title>Cafetería POS</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="manifest" href="./manifest.json">
-    <link rel="icon" href="./icon.png">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>Shmoo Cafe</h1>
-            <div class="shift-status" id="shiftStatus">Turno cerrado</div>
+            <h1>Cafetería</h1>
+            <div id="shiftStatus" class="shift-status">Cerrado</div>
         </header>
 
-        <nav class="tabs">
-            <button class="tab-btn active" data-tab="orders">Pedidos</button>
-            <button class="tab-btn" data-tab="products">Productos</button>
-            <button class="tab-btn" data-tab="cashier">Arqueo</button>
-        </nav>
+        <div class="shift-controls">
+            <div class="shift-top-row">
+                <button id="openShiftBtn" class="btn primary">Abrir Turno</button>
+                <button id="closeShiftBtn" class="btn danger">Cerrar Turno</button>
+            </div>
+            <button id="newOrderBtn" class="highlight-btn">Nuevo Pedido</button>
+        </div>
 
-        <!-- Pestaña Pedidos -->
-        <div class="tab-content active" id="orders-tab">
-            <div class="panel" id="mainPanel">
-                <div class="shift-controls">
-                    <div class="shift-top-row">
-                        <button id="openShiftBtn" class="btn primary">Abrir Turno</button>
-                        <button id="closeShiftBtn" class="btn danger" disabled>Cerrar Turno</button>
-                    </div>
-                    <button id="newOrderBtn" class="btn highlight-btn" disabled>
-                        <span class="icon-add"></span>
-                        NUEVO PEDIDO
-                    </button>
-                </div>
-                
-                <div class="sales-log-container">
-                    <h2>Registro de Ventas</h2>
-                    <div class="sales-log" id="salesLog">
-                        <p class="empty-log">No hay ventas registradas</p>
-                    </div>
+        <div id="mainPanel" class="panel">
+            <div id="menuGrid" class="menu-grid"></div>
+
+            <div class="order-summary">
+                Total: <span id="totalAmount">$0</span>
+            </div>
+
+            <div class="payment-methods">
+                <h3>Métodos de pago</h3>
+                <div class="payment-options">
+                    <label class="payment-option">
+                        <input type="radio" name="payment" value="efectivo">
+                        <span class="custom-radio"></span>Efectivo
+                    </label>
+                    <label class="payment-option">
+                        <input type="radio" name="payment" value="qr">
+                        <span class="custom-radio"></span>QR
+                    </label>
+                    <label class="payment-option">
+                        <input type="radio" name="payment" value="transferencia">
+                        <span class="custom-radio"></span>Transferencia
+                    </label>
                 </div>
             </div>
 
-            <div class="panel hidden" id="orderPanel">
-                <h2>Nuevo Pedido</h2>
-                <div class="menu-grid" id="menuItems">
-                    <!-- Los productos se generarán dinámicamente -->
-                </div>
-
-                <div class="payment-methods">
-                    <h3>Método de Pago</h3>
-                    <div class="payment-options">
-                        <label class="payment-option">
-                            <input type="radio" name="payment" value="cash" checked>
-                            <span class="custom-radio"></span>
-                            Efectivo
-                        </label>
-                        <label class="payment-option">
-                            <input type="radio" name="payment" value="qr">
-                            <span class="custom-radio"></span>
-                            QR
-                        </label>
-                        <label class="payment-option">
-                            <input type="radio" name="payment" value="transfer">
-                            <span class="custom-radio"></span>
-                            Transferencia
-                        </label>
-                    </div>
-                </div>
-
-                <div class="order-summary">
-                    <h3>Total: $<span id="totalAmount">0</span></h3>
-                </div>
-
-                <div class="order-actions">
-                    <button id="completeOrderBtn" class="btn success-btn">
-                        <span class="icon-check"></span>
-                        Confirmar
-                    </button>
-                    <button id="cancelOrderBtn" class="btn cancel-btn">
-                        <span class="icon-close"></span>
-                        Cancelar
-                    </button>
-                </div>
+            <div class="order-actions">
+                <button id="completeOrderBtn" class="success-btn">Confirmar Pedido</button>
+                <button id="cancelOrderBtn" class="cancel-btn">Cancelar Pedido</button>
             </div>
         </div>
 
-        <!-- Pestaña Productos -->
-        <div class="tab-content" id="products-tab">
-            <div class="panel">
-                <h2>Gestión de Productos</h2>
-                <div class="product-form">
-                    <input type="text" id="productName" placeholder="Nombre del producto" class="form-input">
-                    <input type="number" id="productPrice" placeholder="Precio" class="form-input">
-                    <button id="addProductBtn" class="btn primary">
-                        <span class="icon-add"></span>
-                        Agregar
-                    </button>
-                </div>
-                <div class="product-list" id="productList">
-                    <!-- Lista de productos dinámica -->
-                </div>
-            </div>
+        <div class="sales-log" id="salesLog">
+            <p class="empty-log">No hay ventas registradas</p>
         </div>
-
-        <!-- Pestaña Arqueo -->
-        <div class="tab-content" id="cashier-tab">
-            <div class="panel">
-                <h2>Arqueo de Caja</h2>
-                <div class="cashier-summary">
-                    <div class="summary-item">
-                        <span>Efectivo:</span>
-                        <span id="cashTotal">$0</span>
-                    </div>
-                    <div class="summary-item">
-                        <span>QR:</span>
-                        <span id="qrTotal">$0</span>
-                    </div>
-                    <div class="summary-item">
-                        <span>Transferencia:</span>
-                        <span id="transferTotal">$0</span>
-                    </div>
-                    <div class="summary-item total">
-                        <span>Total General:</span>
-                        <span id="grandTotal">$0</span>
-                    </div>
-                </div>
-                <button id="calculateTotalsBtn" class="btn primary">Calcular Arqueo</button>
-            </div>
-        </div>
-
-        <div class="notification" id="notification"></div>
     </div>
 
-    <script src="xlsx.full.min.js"></script>
+    <div class="notification" id="notification"></div>
     <script src="script.js"></script>
 </body>
 </html>
