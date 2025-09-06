@@ -4,7 +4,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const closeShiftBtn = document.getElementById('closeShiftBtn');
     const newOrderBtn = document.getElementById('newOrderBtn');
     const mainPanel = document.getElementById('mainPanel');
-    const orderPanel = document.getElementById('orderPanel');
     const completeOrderBtn = document.getElementById('completeOrderBtn');
     const cancelOrderBtn = document.getElementById('cancelOrderBtn');
     const totalAmount = document.getElementById('totalAmount');
@@ -114,6 +113,7 @@ document.addEventListener('DOMContentLoaded', function() {
         shiftData.orders.forEach((order, index) => {
             const saleDiv = document.createElement('div');
             saleDiv.classList.add('sale-entry');
+
             if(index === shiftData.orders.length -1){
                 saleDiv.style.transform = 'scale(1.2)';
                 saleDiv.style.boxShadow = '0 6px 16px rgba(0,0,0,0.2)';
@@ -138,4 +138,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     renderMenu();
     completeOrderBtn.addEventListener('click', completeOrder);
+    cancelOrderBtn.addEventListener('click', () => {
+        document.querySelectorAll('.quantity').forEach(q => q.textContent = "0");
+        updateTotal();
+    });
 });
