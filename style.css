@@ -230,3 +230,60 @@ h1 {
     .payment-options { flex-direction: column; gap: 10px; }
     .order-actions { flex-direction: column; }
 }
+/* ======================
+   OPTIMIZACIÓN TABLET LANDSCAPE
+   ====================== */
+@media (min-width: 769px) and (max-width: 1200px) and (orientation: landscape) {
+    /* Grilla de productos más columnas */
+    .menu-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+    }
+
+    /* Burbuja de ventas alineadas en fila */
+    .sales-log {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        max-height: none;
+    }
+
+    .sale-entry {
+        flex: 1 1 calc(33% - 16px);
+        margin-bottom: 0;
+    }
+
+    /* Último pedido más grande */
+    .sales-log .sale-entry:first-child {
+        flex: 2 1 calc(66% - 16px);
+    }
+
+    /* Botones Confirmar y Cancelar uno al lado del otro, más separados */
+    .order-actions {
+        justify-content: space-between;
+        flex-direction: row;
+        gap: 24px;
+    }
+
+    .success-btn, .cancel-btn {
+        width: 48%;
+    }
+
+    /* Métodos de pago más espaciados horizontalmente */
+    .payment-options {
+        justify-content: space-around;
+        flex-wrap: wrap;
+    }
+
+    /* Botones + y - más grandes y a la derecha */
+    .quantity-selector {
+        flex-direction: row-reverse;
+        gap: 12px;
+    }
+
+    .qty-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 1.4rem;
+    }
+}
