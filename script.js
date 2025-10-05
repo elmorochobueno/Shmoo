@@ -29,8 +29,6 @@ document.addEventListener('DOMContentLoaded', function() {
         orders: [],
         products: [
             { name: 'Latte', price: 4900 },
-            { name: 'Latte caramelo', price: 5200 },
-            { name: 'Latte vainilla', price: 5200 },
             { name: 'Latte doble', price: 5100 },
             { name: 'Flat White', price: 4800 },
             { name: 'Capu', price: 4700 },
@@ -39,6 +37,8 @@ document.addEventListener('DOMContentLoaded', function() {
             { name: 'Matcha', price: 5300 },
             { name: 'Leche de almendras', price: 1000 },
             { name: 'Extra shot', price: 800 },
+            { name: 'Vainilla', price: 300 },
+            { name: 'Caramelo', price: 300 },
         ]
     };
 
@@ -330,7 +330,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 `#${order.orderNumber}`,
                 orderedItems.join(', '),
                 method,
-                `$${order.total.toLocaleString()}`,
+                order.total,  // ← Solo el número, sin formato
                 timeString
             ]);
         });
