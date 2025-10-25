@@ -39,6 +39,9 @@ document.addEventListener('DOMContentLoaded', function() {
             { name: 'Extra shot', price: 800 },
             { name: 'Vainilla', price: 300 },
             { name: 'Caramelo', price: 300 },
+            { name: 'Latte Frío', price: 4900},
+            { name: 'Latte doble Frío', price: 4900},
+            { name: 'Cuarto de kg', price: 18000},
         ]
     };
 
@@ -310,12 +313,15 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         const wb = XLSX.utils.book_new();
+        
+        // Hoja 1: Resumen de Ventas
         const summaryData = [
             ['RESUMEN DE VENTAS'],
             ['Fecha', new Date().toLocaleString('es-CL')],
             [],
             ['Pedido', 'Productos', 'Método de Pago', 'Total', 'Hora']
         ];
+        
         shiftData.orders.forEach(order => {
             const orderedItems = [];
             for (const [item, quantity] of Object.entries(order.items)) {
@@ -330,12 +336,70 @@ document.addEventListener('DOMContentLoaded', function() {
                 `#${order.orderNumber}`,
                 orderedItems.join(', '),
                 method,
-                order.total,  // ← Solo el número, sin formato
+                order.total,  // Solo el número, sin formato
                 timeString
             ]);
         });
-        const ws = XLSX.utils.aoa_to_sheet(summaryData);
-        XLSX.utils.book_append_sheet(wb, ws, 'Resumen');
+        
+        const wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
+        XLSX.utils.book_append_sheet(wb, wsSummary, 'Resumen');
+        
+        // Hoja 2: Estadísticas de Productos
+        const productStatsData = [
+            ['ESTADÍSTICAS DE PRODUCTOS'],
+            ['Fecha', new Date().toLocaleString('es-CL')],
+            []
+        ];
+        
+        // Calcular totales por producto
+        const productTotals = {};
+        shiftData.products.forEach(product => {
+            productTotals[product.name] = 0;
+        });
+        
+        shiftData.orders.forEach(order => {
+            for (const [productName, quantity] of Object.entries(order.items)) {
+                if (quantity > 0) {
+                    productTotals[productName] += quantity;
+                }
+            }
+        });
+        
+        // Definir productos que NO son cafés
+        const nonCoffeeItems = [
+            'Leche de almendras', 'Vainilla', 'Caramelo', 'Extra shot', 
+            'Matcha', 'Cuarto de kg'
+        ];
+        
+        let totalCafes = 0;
+        
+        // Agregar encabezados
+        productStatsData.push(['Producto', 'Cantidad Vendida']);
+        productStatsData.push([]);
+        
+        // Agregar total de cafés primero
+        shiftData.products.forEach(product => {
+            if (!nonCoffeeItems.includes(product.name)) {
+                totalCafes += productTotals[product.name];
+            }
+        });
+        
+        productStatsData.push(['TOTAL CAFÉS', totalCafes]);
+        productStatsData.push([]);
+        
+        // Agregar cada producto individual
+        shiftData.products.forEach(product => {
+            productStatsData.push([product.name, productTotals[product.name]]);
+        });
+        
+        // Agregar total general
+        productStatsData.push([]);
+        const totalGeneral = Object.values(productTotals).reduce((sum, quantity) => sum + quantity, 0);
+        productStatsData.push(['TOTAL GENERAL', totalGeneral]);
+        
+        const wsStats = XLSX.utils.aoa_to_sheet(productStatsData);
+        XLSX.utils.book_append_sheet(wb, wsStats, 'Estadísticas');
+        
         const fileName = `ShmooCafe_${new Date().toISOString().split('T')[0]}_Turno.xlsx`;
         XLSX.writeFile(wb, fileName);
     }
@@ -346,4 +410,4 @@ document.addEventListener('DOMContentLoaded', function() {
         notification.className = 'notification show ' + (isError ? 'error' : 'success');
         setTimeout(() => { notification.classList.remove('show'); }, 3000);
     }
-});w
+});
