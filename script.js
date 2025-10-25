@@ -24,31 +24,35 @@ document.addEventListener('DOMContentLoaded', function() {
     const tabContents = document.querySelectorAll('.tab-content');
 
     let currentOrder = {};
+    let currentProductType = 'beverage'; // 'beverage' o 'addon'
     let shiftData = JSON.parse(localStorage.getItem('shmooShift')) || {
         isOpen: false,
         orders: [],
         products: [
-            { name: 'Latte', price: 4900 },
-            { name: 'Latte doble', price: 5100 },
-            { name: 'Flat White', price: 4800 },
-            { name: 'Capu', price: 4700 },
-            { name: 'Americano', price: 4500 },
-            { name: 'Doppio', price: 3000 },
-            { name: 'Matcha', price: 5300 },
-            { name: 'Leche de almendras', price: 1000 },
-            { name: 'Extra shot', price: 800 },
-            { name: 'Vainilla', price: 300 },
-            { name: 'Caramelo', price: 300 },
-            { name: 'Latte Frío', price: 4900},
-            { name: 'Latte doble Frío', price: 4900},
-            { name: 'Cuarto de kg', price: 18000},
+            { name: 'Latte', price: 4900, type: 'beverage' },
+            { name: 'Latte doble', price: 5100, type: 'beverage' },
+            { name: 'Flat White', price: 4800, type: 'beverage' },
+            { name: 'Capu', price: 4700, type: 'beverage' },
+            { name: 'Americano', price: 4500, type: 'beverage' },
+            { name: 'Doppio', price: 3000, type: 'beverage' },
+            { name: 'Matcha', price: 5300, type: 'beverage' },
+            { name: 'Leche de almendras', price: 1000, type: 'addon' },
+            { name: 'Extra shot', price: 800, type: 'addon' },
+            { name: 'Vainilla', price: 300, type: 'addon' },
+            { name: 'Caramelo', price: 300, type: 'addon' },
+            { name: 'Latte Frío', price: 4900, type: 'beverage'},
+            { name: 'Latte doble Frío', price: 4900, type: 'beverage'},
+            { name: 'Cuarto de kg', price: 18000, type: 'addon'},
         ]
     };
 
+    // Migrar productos existentes
+    migrateExistingProducts();
     updateUI();
     loadProducts();
     renderMenuItems();
 
+    // Event Listeners
     openShiftBtn.addEventListener('click', openShift);
     closeShiftBtn.addEventListener('click', closeShift);
     newOrderBtn.addEventListener('click', startNewOrder);
@@ -57,12 +61,35 @@ document.addEventListener('DOMContentLoaded', function() {
     addProductBtn.addEventListener('click', addProduct);
     calculateTotalsBtn.addEventListener('click', calculateCashierTotals);
 
+    // Selector de tipo de producto
+    document.querySelectorAll('.type-option').forEach(option => {
+        option.addEventListener('click', function() {
+            document.querySelectorAll('.type-option').forEach(opt => opt.classList.remove('selected'));
+            this.classList.add('selected');
+            currentProductType = this.getAttribute('data-type');
+        });
+    });
+
     tabBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             const tabId = btn.getAttribute('data-tab');
             switchTab(tabId);
         });
     });
+
+    function migrateExistingProducts() {
+        let needsMigration = false;
+        shiftData.products.forEach(product => {
+            if (!product.type) {
+                product.type = 'beverage';
+                needsMigration = true;
+            }
+        });
+        if (needsMigration) {
+            saveData();
+            console.log('Productos migrados exitosamente');
+        }
+    }
 
     function openShift() {
         shiftData = {
@@ -132,7 +159,13 @@ document.addEventListener('DOMContentLoaded', function() {
             showNotification('Ingresa nombre y precio válidos', true);
             return;
         }
-        shiftData.products.push({ name, price });
+        
+        shiftData.products.push({ 
+            name, 
+            price,
+            type: currentProductType
+        });
+        
         saveData();
         loadProducts();
         renderMenuItems();
@@ -160,23 +193,30 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function loadProducts() {
-        productList.innerHTML = shiftData.products.map((product, index) => `
-            <div class="product-item">
-                <div class="product-info">
-                    <div class="product-name">${product.name}</div>
-                    <div class="product-price">$${product.price.toLocaleString()}</div>
+        productList.innerHTML = shiftData.products.map((product, index) => {
+            const tipo = product.type === 'beverage' ? '🥤 Bebida' : '🧂 Complemento';
+            const tipoClass = product.type === 'beverage' ? 'type-beverage' : 'type-addon';
+            return `
+                <div class="product-item">
+                    <div class="product-info">
+                        <div class="product-name">${product.name}</div>
+                        <div class="product-price">$${product.price.toLocaleString()}</div>
+                        <div class="product-type ${tipoClass}">${tipo}</div>
+                    </div>
+                    <div class="product-actions">
+                        <button class="btn edit-product" data-index="${index}">Editar</button>
+                        <button class="btn danger delete-product" data-index="${index}">Eliminar</button>
+                    </div>
                 </div>
-                <div class="product-actions">
-                    <button class="btn edit-product" data-index="${index}">Editar</button>
-                    <button class="btn danger delete-product" data-index="${index}">Eliminar</button>
-                </div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
+        
         document.querySelectorAll('.delete-product').forEach(btn => {
             btn.addEventListener('click', function() {
                 deleteProduct(parseInt(this.getAttribute('data-index')));
             });
         });
+        
         document.querySelectorAll('.edit-product').forEach(btn => {
             btn.addEventListener('click', function() {
                 editProduct(parseInt(this.getAttribute('data-index')));
@@ -195,9 +235,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function editProduct(index) {
-        const newPrice = prompt(`Editar precio de "${shiftData.products[index].name}"`, shiftData.products[index].price);
+        const product = shiftData.products[index];
+        const newPrice = prompt(`Editar precio de "${product.name}"`, product.price);
         if (newPrice && !isNaN(newPrice)) {
-            shiftData.products[index].price = parseInt(newPrice);
+            product.price = parseInt(newPrice);
             saveData();
             loadProducts();
             renderMenuItems();
@@ -245,7 +286,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 currentOrder[productName] = quantity;
                 updateTotal();
                 
-                // Efecto visual al cambiar cantidad
                 if (quantity > 0) {
                     quantityEl.style.fontWeight = 'bold';
                     quantityEl.style.color = '#2e68b0';
@@ -274,11 +314,12 @@ document.addEventListener('DOMContentLoaded', function() {
             if (order.paymentMethod === 'cash') method = 'Efectivo';
             else if (order.paymentMethod === 'qr') method = 'QR';
             
-            // Determinar si es la última venta (primera en la lista invertida)
             const isLastSale = index === 0;
+            const originalIndex = shiftData.orders.length - 1 - index;
             
             return `
                 <div class="sale-entry ${isLastSale ? 'last-sale' : ''}">
+                    <button class="delete-sale-btn" data-index="${originalIndex}" title="Eliminar venta">×</button>
                     <div class="sale-header ${isLastSale ? 'last-sale-header' : ''}">
                         <span>Pedido #${order.orderNumber}</span>
                         <span>$${order.total.toLocaleString()}</span>
@@ -291,9 +332,33 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
             `;
         }).join('');
+        
+        document.querySelectorAll('.delete-sale-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const orderIndex = parseInt(this.getAttribute('data-index'));
+                deleteSale(orderIndex);
+            });
+        });
     }
 
-    function updateTotal() { totalAmount.textContent = calculateTotal().toLocaleString(); }
+    function deleteSale(orderIndex) {
+        if (confirm('¿Estás seguro de que deseas borrar esta venta?')) {
+            shiftData.orders.splice(orderIndex, 1);
+            
+            shiftData.orders.forEach((order, index) => {
+                order.orderNumber = index + 1;
+            });
+            
+            saveData();
+            updateSalesLog();
+            showNotification('Venta eliminada correctamente');
+        }
+    }
+
+    function updateTotal() { 
+        totalAmount.textContent = calculateTotal().toLocaleString(); 
+    }
+    
     function calculateTotal() {
         return shiftData.products.reduce((total, product) => {
             return total + ((currentOrder[product.name] || 0) * product.price);
@@ -336,7 +401,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 `#${order.orderNumber}`,
                 orderedItems.join(', '),
                 method,
-                order.total,  // Solo el número, sin formato
+                order.total,
                 timeString
             ]);
         });
@@ -351,7 +416,6 @@ document.addEventListener('DOMContentLoaded', function() {
             []
         ];
         
-        // Calcular totales por producto
         const productTotals = {};
         shiftData.products.forEach(product => {
             productTotals[product.name] = 0;
@@ -365,36 +429,24 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        // Definir productos que NO son cafés
-        const nonCoffeeItems = [
-            'Leche de almendras', 'Vainilla', 'Caramelo', 'Extra shot', 'Cuarto de kg'
-        ];
+        let totalBebidas = 0;
         
-        let totalCafes = 0;
-        
-        // Agregar encabezados
-        productStatsData.push(['Producto', 'Cantidad Vendida']);
+        productStatsData.push(['Producto', 'Cantidad Vendida', 'Tipo']);
         productStatsData.push([]);
         
-        // Agregar total de cafés primero
         shiftData.products.forEach(product => {
-            if (!nonCoffeeItems.includes(product.name)) {
-                totalCafes += productTotals[product.name];
+            if (product.type === 'beverage') {
+                totalBebidas += productTotals[product.name] || 0;
             }
         });
         
-        productStatsData.push(['TOTAL CAFÉS', totalCafes]);
+        productStatsData.push(['TOTAL BEBIDA', totalBebidas, '']);
         productStatsData.push([]);
         
-        // Agregar cada producto individual
         shiftData.products.forEach(product => {
-            productStatsData.push([product.name, productTotals[product.name]]);
+            const tipo = product.type === 'beverage' ? 'Bebida' : 'Complemento';
+            productStatsData.push([product.name, productTotals[product.name] || 0, tipo]);
         });
-        
-        // Agregar total general
-        productStatsData.push([]);
-        const totalGeneral = Object.values(productTotals).reduce((sum, quantity) => sum + quantity, 0);
-        productStatsData.push(['TOTAL GENERAL', totalGeneral]);
         
         const wsStats = XLSX.utils.aoa_to_sheet(productStatsData);
         XLSX.utils.book_append_sheet(wb, wsStats, 'Estadísticas');
@@ -403,7 +455,10 @@ document.addEventListener('DOMContentLoaded', function() {
         XLSX.writeFile(wb, fileName);
     }
 
-    function saveData() { localStorage.setItem('shmooShift', JSON.stringify(shiftData)); }
+    function saveData() { 
+        localStorage.setItem('shmooShift', JSON.stringify(shiftData)); 
+    }
+    
     function showNotification(message, isError = false) {
         notification.textContent = message;
         notification.className = 'notification show ' + (isError ? 'error' : 'success');
