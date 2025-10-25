@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const tabContents = document.querySelectorAll('.tab-content');
 
     let currentOrder = {};
-    let currentProductType = 'beverage'; // 'beverage' o 'addon'
+    let currentProductType = 'beverage';
     let shiftData = JSON.parse(localStorage.getItem('shmooShift')) || {
         isOpen: false,
         orders: [],
@@ -303,7 +303,10 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        salesLog.innerHTML = [...shiftData.orders].reverse().map((order, index) => {
+        // Ordenar por timestamp para mostrar el más reciente primero
+        const sortedOrders = [...shiftData.orders].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        
+        salesLog.innerHTML = sortedOrders.map((order, index) => {
             const orderedItems = [];
             for (const [item, quantity] of Object.entries(order.items)) {
                 if (quantity > 0) orderedItems.push(`${item}: ${quantity}`);
@@ -314,12 +317,12 @@ document.addEventListener('DOMContentLoaded', function() {
             if (order.paymentMethod === 'cash') method = 'Efectivo';
             else if (order.paymentMethod === 'qr') method = 'QR';
             
+            // El primer elemento (index 0) es el más reciente
             const isLastSale = index === 0;
-            const originalIndex = shiftData.orders.length - 1 - index;
             
             return `
                 <div class="sale-entry ${isLastSale ? 'last-sale' : ''}">
-                    <button class="delete-sale-btn" data-index="${originalIndex}" title="Eliminar venta">×</button>
+                    <button class="delete-sale-btn" data-index="${shiftData.orders.indexOf(order)}" title="Eliminar venta">×</button>
                     <div class="sale-header ${isLastSale ? 'last-sale-header' : ''}">
                         <span>Pedido #${order.orderNumber}</span>
                         <span>$${order.total.toLocaleString()}</span>
@@ -345,6 +348,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (confirm('¿Estás seguro de que deseas borrar esta venta?')) {
             shiftData.orders.splice(orderIndex, 1);
             
+            // Re-numerar todos los pedidos
             shiftData.orders.forEach((order, index) => {
                 order.orderNumber = index + 1;
             });
@@ -440,7 +444,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        productStatsData.push(['TOTAL BEBIDA', totalBebidas, '']);
+        productStatsData.push(['TOTAL BEBIDAS', totalBebidas, '']);
         productStatsData.push([]);
         
         shiftData.products.forEach(product => {
