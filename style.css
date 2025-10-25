@@ -437,11 +437,11 @@ h1 {
     color: #555 !important;
 }
 
-/* Botón eliminar venta - POSICIONADO MÁS EN LA ESQUINA */
+/* Botón eliminar venta - QUE SOBRESALGA DE LA BURBUJA */
 .delete-sale-btn {
     position: absolute;
-    top: 8px;
-    right: 8px;
+    top: -8px;
+    right: -8px;
     background: var(--danger-color);
     color: white;
     border: none;
@@ -454,7 +454,8 @@ h1 {
     justify-content: center;
     font-size: 0.8rem;
     transition: var(--transition);
-    z-index: 10;
+    z-index: 20;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
 }
 
 .delete-sale-btn:hover {
