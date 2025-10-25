@@ -367,8 +367,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Definir productos que NO son cafés
         const nonCoffeeItems = [
-            'Leche de almendras', 'Vainilla', 'Caramelo', 'Extra shot', 
-            'Matcha', 'Cuarto de kg'
+            'Leche de almendras', 'Vainilla', 'Caramelo', 'Extra shot', 'Cuarto de kg'
         ];
         
         let totalCafes = 0;
