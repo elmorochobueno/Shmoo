@@ -92,16 +92,23 @@
         <div class="tab-content" id="products-tab">
             <div class="panel">
                 <h2>Gestión de Productos</h2>
-                <div class="product-form">
+                <div class="form-group">
                     <input type="text" id="productName" placeholder="Nombre del producto" class="form-input">
                     <input type="number" id="productPrice" placeholder="Precio" class="form-input">
-                    <button id="addProductBtn" class="btn primary">
-                        <span class="icon-add"></span>
-                        Agregar
-                    </button>
                 </div>
-                <div class="product-list" id="productList">
-                    <!-- Lista de productos dinámica -->
+                <!-- SELECTOR DE TIPO AGREGADO AQUÍ -->
+                <div class="product-type-selector">
+                    <div class="type-option type-beverage selected" data-type="beverage">🥤 Bebida</div>
+                    <div class="type-option type-addon" data-type="addon">🧂 Complemento</div>
+                </div>
+                <button id="addProductBtn" class="btn primary">
+                    <span class="icon-add"></span>
+                    Agregar Producto
+                </button>
+                <div class="products-management">
+                    <div class="product-list" id="productList">
+                        <!-- Lista de productos dinámica -->
+                    </div>
                 </div>
             </div>
         </div>
@@ -111,19 +118,19 @@
             <div class="panel">
                 <h2>Arqueo de Caja</h2>
                 <div class="cashier-summary">
-                    <div class="summary-item">
+                    <div class="total-row">
                         <span>Efectivo:</span>
                         <span id="cashTotal">$0</span>
                     </div>
-                    <div class="summary-item">
+                    <div class="total-row">
                         <span>QR:</span>
                         <span id="qrTotal">$0</span>
                     </div>
-                    <div class="summary-item">
+                    <div class="total-row">
                         <span>Transferencia:</span>
                         <span id="transferTotal">$0</span>
                     </div>
-                    <div class="summary-item total">
+                    <div class="total-row">
                         <span>Total General:</span>
                         <span id="grandTotal">$0</span>
                     </div>
