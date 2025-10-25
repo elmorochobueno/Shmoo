@@ -582,6 +582,85 @@ h1 {
     background-color: var(--danger-color);
 }
 
+/* FORM INPUTS */
+.form-group {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.form-input {
+    flex: 1;
+    padding: 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: var(--border-radius);
+    font-size: 1.1rem;
+    transition: var(--transition);
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+/* Selector de tipo de producto */
+.product-type-selector {
+    display: flex;
+    gap: 15px;
+    margin: 15px 0;
+}
+
+.type-option {
+    flex: 1;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: var(--border-radius);
+    text-align: center;
+    cursor: pointer;
+    transition: var(--transition);
+    font-weight: 600;
+}
+
+.type-option.selected {
+    border-color: var(--primary-color);
+    background-color: #e3f2fd;
+    color: var(--primary-color);
+}
+
+.type-beverage {
+    border-color: #4caf50;
+}
+
+.type-beverage.selected {
+    background-color: #e8f5e8;
+    color: #4caf50;
+}
+
+.type-addon.selected {
+    background-color: #fff3e0;
+    color: #ff9800;
+}
+
+/* Tipo de producto en lista */
+.product-type {
+    font-size: 0.85rem;
+    padding: 4px 8px;
+    border-radius: 12px;
+    display: inline-block;
+    margin-top: 5px;
+    font-weight: 600;
+}
+
+.type-beverage {
+    background-color: #e8f5e8;
+    color: #4caf50;
+}
+
+.type-addon {
+    background-color: #fff3e0;
+    color: #ff9800;
+}
+
 /* Scrollbar personalizado */
 ::-webkit-scrollbar {
     width: 8px;
